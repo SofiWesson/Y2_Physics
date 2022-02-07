@@ -1,6 +1,13 @@
 #include "RigidBody.h"
 #include <glm/glm.hpp>
+#include <Gizmos.h>
+#include <glm/ext.hpp>
 #include <iostream>
+#include <math.h>
+
+#include <string>
+#include <stdio.h>
+#include <ctype.h>
 
 RigidBody::RigidBody(
 	ShapeType a_shapeID, glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass) :
@@ -11,6 +18,7 @@ RigidBody::RigidBody(
 	m_rotation = a_rotation;
 	m_mass = a_mass;
 	m_elasticity = 1;
+	m_angularVelocity = 0;
 }
 
 RigidBody::~RigidBody()
@@ -26,7 +34,7 @@ void RigidBody::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 	m_rotation += m_angularVelocity * a_timeStep;
 }
 
-void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal)
+void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal, float pen)
 {
 	/* We need to find the vector between their centers or use the provided
 	   directional force, and make sure it is normalised */
@@ -71,4 +79,27 @@ float RigidBody::GetKineticEnergy()
 	float totalEnergy = (m_mass * glm::dot(m_velocity, m_velocity)) / 2;
 	
 	return totalEnergy;
+}
+
+float RigidBody::OpposingColour(float a_value)
+{
+	// percentile to rgb
+	float rgbValue = glm::round(a_value * 255);
+
+	// convert rgb to hex values
+	float fHexValue = rgbValue / 16;
+	int hex1Value = glm::round(fHexValue);
+	int hex2Value = (fHexValue - hex1Value) * 16;
+
+	// invert hex values
+	hex1Value = 15 - hex1Value;
+	hex2Value = 15 - hex2Value;
+
+	// convert hex values back into rgb
+	rgbValue = (hex1Value * 16) + hex2Value;
+
+	// convert rgb back into percentile
+	float percentile = rgbValue / 255;
+
+	return percentile;
 }

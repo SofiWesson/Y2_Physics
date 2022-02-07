@@ -1,11 +1,14 @@
 #include <list>
 #include <iostream>
+#include <algorithm>
+#include <glm/ext.hpp>
 
 #include "PhysicsScene.h"
 #include "PhysicsObject.h"
 #include "RigidBody.h"
 #include "Circle.h"
 #include "Plane.h"
+#include "Box.h"
 #include "Player.h"
 
 PhysicsScene::PhysicsScene() :
@@ -67,10 +70,9 @@ void PhysicsScene::Draw()
 typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
 static fn collisionFunctionArray[] =
 {
-	PhysicsScene::Plane2Plane,  PhysicsScene::Plane2Circle,  PhysicsScene::Plane2Player,   PhysicsScene::Plane2Box,
-	PhysicsScene::Circle2Plane, PhysicsScene::Circle2Circle, PhysicsScene::Circle2Player, PhysicsScene::Circle2Box,
-	PhysicsScene::Player2Plane, PhysicsScene::Player2Circle, PhysicsScene::Player2Player, PhysicsScene::Player2Box,
-	PhysicsScene::Box2Plane,    PhysicsScene::Box2Circle,    PhysicsScene::Box2Player,    PhysicsScene::Box2Box,
+	PhysicsScene::Plane2Plane,  PhysicsScene::Plane2Circle,  PhysicsScene::Plane2Box,
+	PhysicsScene::Circle2Plane, PhysicsScene::Circle2Circle, PhysicsScene::Circle2Box,
+	PhysicsScene::Box2Plane,    PhysicsScene::Box2Circle,    PhysicsScene::Box2Box,
 };
 
 void PhysicsScene::CheckForCollisions()
@@ -100,6 +102,7 @@ void PhysicsScene::CheckForCollisions()
 	}
 }
 
+// =============================================== PLANE ===============================================
 bool PhysicsScene::Plane2Plane(PhysicsObject* a_plane, PhysicsObject* a_otherPlane)
 {
 	return false;
@@ -110,23 +113,52 @@ bool PhysicsScene::Plane2Circle(PhysicsObject* a_plane, PhysicsObject* a_circle)
 	return Circle2Plane(a_circle, a_plane);
 }
 
-bool PhysicsScene::Plane2Player(PhysicsObject* a_plane, PhysicsObject* a_player)
+bool PhysicsScene::Plane2Box(PhysicsObject* a_plane, PhysicsObject* a_box)
 {
 	Plane* plane = dynamic_cast<Plane*>(a_plane);
-	Player* player = dynamic_cast<Player*>(a_player);
+	Box* box = dynamic_cast<Box*>(a_box);
 
-	// if this is successful then test for a collision
-
-	if (player != nullptr && plane != nullptr)
+	// When the arguments return true collision test
+	if (box != nullptr && plane != nullptr)
 	{
-		glm::vec2 collisionNormal = plane->GetNormal();
-		float circleToPlane = glm::dot(player->GetPosition(), plane->GetNormal()) - plane->GetDistance();
-		float intersection = player->GetRadius() - circleToPlane;
-		float velocityOutOfThePlane = glm::dot(player->GetVelocity(), plane->GetNormal());
-		if (intersection > 0 && velocityOutOfThePlane < 0)
+		int numContacts = 0;
+		glm::vec2 contact(0, 0);
+		float contactV = 0;
+
+		glm::vec2 planeOrigin = plane->GetNormal() * plane->GetDistance();
+
+		// Check all four corners of the box for if any have touched the plane
+		for (float x = -box->GetExtents().x; x < box->GetWidth(); x += box->GetWidth())
 		{
-			// We can set the circles respones
-			player->ApplyForce(-player->GetVelocity() * player->GetMass(), player->GetPosition());
+			for (float y = -box->GetExtents().y; y < box->GetHeight(); y += box->GetHeight())
+			{
+				// Next, grab the position of the corner in world space
+				glm::vec2 p = box->GetPosition() + x * box->GetLocalX() + y * box->GetLocalY();
+				float distanceFromPlane = glm::dot(p - planeOrigin, plane->GetNormal());
+
+				// This is the total velocity of the box's points in world space
+				glm::vec2 displacement = x * box->GetLocalX() + y * box->GetLocalY();
+				glm::vec2 pointVelocity = box->GetVelocity() + box->GetAngularVelocity() * glm::vec2(-displacement.y, displacement.x);
+
+				// This is the component of the point velocity into the plane
+				float velocityIntoPlane = glm::dot(pointVelocity, plane->GetNormal());
+
+				// While our box is penetrating the plane...
+				if (distanceFromPlane < 0 && velocityIntoPlane <= 0)
+				{
+					numContacts++;
+					contact += p;
+					contactV += velocityIntoPlane;
+				}
+			}
+		}
+
+		// We have a hit if greater then 0, typically only 1 to 2 corners will collide
+		if (numContacts > 0)
+		{
+			// 
+
+			plane->ResolvePlaneCollision(box, contact / (float)numContacts);
 			return true;
 		}
 	}
@@ -134,11 +166,7 @@ bool PhysicsScene::Plane2Player(PhysicsObject* a_plane, PhysicsObject* a_player)
 	return false;
 }
 
-bool PhysicsScene::Plane2Box(PhysicsObject* a_plane, PhysicsObject* a_box)
-{
-	return false;
-}
-
+// =============================================== CIRCLE ===============================================
 bool PhysicsScene::Circle2Plane(PhysicsObject* a_circle, PhysicsObject* a_plane)
 {
 	Circle* circle = dynamic_cast<Circle*>(a_circle);
@@ -154,8 +182,10 @@ bool PhysicsScene::Circle2Plane(PhysicsObject* a_circle, PhysicsObject* a_plane)
 		float velocityOutOfThePlane = glm::dot(circle->GetVelocity(), plane->GetNormal());
 		if (intersection > 0 && velocityOutOfThePlane < 0)
 		{
-			// We can set the circles respones
-			circle->ApplyForce(-circle->GetVelocity() * circle->GetMass(), circle->GetPosition());
+			// We can set objects to respond to a plane collision
+			glm::vec2 contact = circle->GetPosition() + (collisionNormal * -circle->GetRadius());
+			plane->ResolvePlaneCollision(circle, contact);
+
 			return true;
 		}
 	}
@@ -189,90 +219,59 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	return false;
 }
 
-bool PhysicsScene::Circle2Player(PhysicsObject* a_circle, PhysicsObject* a_player)
-{
-	// Tries to cast the object to circle to circle
-	Circle* circle = dynamic_cast<Circle*>(a_circle);
-	Player* player = dynamic_cast<Player*>(a_player);
-
-	// If successful then test for collision
-	if (circle != nullptr && a_player != nullptr)
-	{
-		// Do the maths to change for the overlap
-		float dist = glm::distance(circle->GetPosition(), player->GetPosition());
-
-		// if the circles touch, reseolve the colluision.
-		float penetration = circle->GetRadius() + player->GetRadius() - dist;
-
-		if (penetration > 0)
-		{
-			circle->ResolveCollision(player, .5f * (circle->GetPosition() + player->GetPosition()));
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool PhysicsScene::Circle2Box(PhysicsObject* a_circle, PhysicsObject* a_box)
 {
-	return false;
+	return Box2Circle(a_box, a_circle);
 }
 
-bool PhysicsScene::Player2Plane(PhysicsObject* a_player, PhysicsObject* a_plane)
-{
-	return Plane2Player(a_plane, a_player);
-}
-
-bool PhysicsScene::Player2Circle(PhysicsObject* a_player, PhysicsObject* a_circle)
-{
-	return Circle2Player(a_circle, a_player);
-}
-
-bool PhysicsScene::Player2Player(PhysicsObject* a_player, PhysicsObject* a_otherPlayer)
-{
-	// Tries to cast the object to circle to circle
-	Player* player1 = dynamic_cast<Player*>(a_player);
-	Player* player2 = dynamic_cast<Player*>(a_otherPlayer);
-
-	// If successful then test for collision
-	if (player1 != nullptr && player2 != nullptr)
-	{
-		// Do the maths to change for the overlap
-		float dist = glm::distance(player1->GetPosition(), player2->GetPosition());
-
-		// if the circles touch, reseolve the colluision.
-		float penetration = player1->GetRadius() + player2->GetRadius() - dist;
-
-		if (penetration > 0)
-		{
-			player1->ResolveCollision(player2, .5f * (player1->GetPosition() + player2->GetPosition()));
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool PhysicsScene::Player2Box(PhysicsObject* a_player, PhysicsObject* a_box)
-{
-	return false;
-}
-
+// =============================================== BOX ===============================================
 bool PhysicsScene::Box2Plane(PhysicsObject* a_box, PhysicsObject* a_plane)
 {
-	return false;
+	return Plane2Box(a_plane, a_box);
 }
 
 bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 {
-	return false;
-}
+	Circle* circle = dynamic_cast<Circle*>(a_circle);
+	Box* box = dynamic_cast<Box*>(a_box);
 
-bool PhysicsScene::Box2Player(PhysicsObject* a_box, PhysicsObject* a_player)
-{
+	if (box != nullptr && circle != nullptr)
+	{
+		// Transform the circle into the box's coordinate space
+		glm::vec2 circlePosWorld = circle->GetPosition() - box->GetPosition();
+		glm::vec2 circlePosBox = glm::vec2(glm::dot(circlePosWorld, box->GetLocalX()), glm::dot(circlePosBox, box->GetLocalY()));
+
+		/* Then find the closest point to the circle center on the box, do this by clamping the coordinate in the box-space
+		   to the box's extents */
+		glm::vec2 closestPointOnBox = circlePosBox;
+		glm::vec2 extents = box->GetExtents();
+
+		if (closestPointOnBox.x < -extents.x)
+			closestPointOnBox.x = -extents.x;
+		if (closestPointOnBox.x > extents.x)
+			closestPointOnBox.x = extents.x;
+		if (closestPointOnBox.y < -extents.y)
+			closestPointOnBox.y = -extents.y;
+		if (closestPointOnBox.y > extents.y)
+			closestPointOnBox.y = extents.y;
+
+		// Finally, convert back to world coordinates
+		glm::vec2 closestPointInBoxWorld = box->GetPosition() + closestPointOnBox.x * box->GetLocalX() + closestPointOnBox.y * box->GetLocalY();
+
+		glm::vec2 circleToBox = circle->GetPosition() - closestPointInBoxWorld;
+
+		float penetration = circle->GetRadius() - glm::length(circleToBox);
+
+		if (penetration > 0)
+		{
+			glm::vec2 direction = glm::normalize(circleToBox);
+			glm::vec2 contact = closestPointInBoxWorld;
+			box->ResolveCollision(circle, contact, &direction);
+
+			return true;
+		}
+	}
+
 	return false;
 }
 

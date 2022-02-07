@@ -10,13 +10,14 @@
 #include "Circle.h"
 #include "Plane.h"
 #include "Player.h"
+#include "Box.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 PhysicsApp::PhysicsApp()
 {
-
+	
 }
 
 PhysicsApp::~PhysicsApp()
@@ -24,8 +25,8 @@ PhysicsApp::~PhysicsApp()
 
 }
 
-bool PhysicsApp::startup() {
-
+bool PhysicsApp::startup() // game manager
+{
 	// Increase the 2d line count to maximise the number of objects we can draw
 
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
@@ -46,11 +47,14 @@ bool PhysicsApp::startup() {
 	m_physicsScene->SetTimeStep(0.01f);
 
 	Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
-	
-	Circle* ball1 = CreateCircle(glm::vec2(-20, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 1, 1, 1), glm::vec2(20.f, 20.f));
-	Circle* ball2 = CreateCircle(glm::vec2(10, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(-20, 20.f));
 
-	m_player = CreatePlayer(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f));
+	Box* box = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 1, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
+	
+	Circle* ball1 = CreateCircle(glm::vec2(0, 20), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, -50));
+	// Circle* ball2 = CreateCircle(glm::vec2(10, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0));
+
+	// m_player = CreatePlayer(glm::vec2(10, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
+	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
 	return true;
 }
@@ -105,10 +109,13 @@ void PhysicsApp::PlayerControl(Player* a_player, aie::Input* a_input)
 {
 	if (a_input->isKeyDown(aie::INPUT_KEY_W))
 		a_player->ApplyForce(glm::vec2(0, 5.f), a_player->GetPosition());
+
 	if (a_input->isKeyDown(aie::INPUT_KEY_A))
 		a_player->ApplyForce(glm::vec2(-5.f, 0), a_player->GetPosition());
+
 	if (a_input->isKeyDown(aie::INPUT_KEY_S))
 		a_player->ApplyForce(glm::vec2(0, -5.f), a_player->GetPosition());
+
 	if (a_input->isKeyDown(aie::INPUT_KEY_D))
 		a_player->ApplyForce(glm::vec2(5.f, 0), a_player->GetPosition());
 }
@@ -152,4 +159,24 @@ Player* PhysicsApp::CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 	m_physicsScene->AddActor(player);
 
 	return player;
+}
+
+Player* PhysicsApp::CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour)
+{
+	Player* player = new Player(a_pos, a_vel, a_rot, a_mass, a_width, a_height, a_colour);
+
+	m_physicsScene->AddActor(player);
+
+	return player;
+}
+
+Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force)
+{
+	Box* box = new Box(a_pos, a_vel, a_rot, a_mass, a_width, a_height, a_colour);
+
+	m_physicsScene->AddActor(box);
+
+	box->ApplyForce(a_force, box->GetPosition());
+
+	return box;
 }

@@ -8,7 +8,6 @@ enum ShapeType
 {
 	PLANE = 0,
 	CIRCLE,
-	PLAYER,
 	BOX,
 	SHAPE_COUNT
 };
