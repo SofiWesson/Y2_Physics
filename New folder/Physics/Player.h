@@ -1,9 +1,19 @@
 #pragma once
 #include "Circle.h"
+#include "Box.h"
+#include "Player.h"
+#include "RigidBody.h"
+
 #include <Input.h>
+
+// class RigidBody;
 
 class Player : public RigidBody
 {
+	// rigidboy->collider
+	// collider = box || circle
+	// position of collider is glued to player
+
 public:
 	Player(glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius, glm::vec4 a_colour);
 	Player(glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass, float a_width, float a_height, glm::vec4 a_colour);
@@ -13,6 +23,8 @@ public:
 	virtual void MakeGizmo();
 
 	void PlayerController(Player* a_player, aie::Input* a_input);
+
+	bool CheckCorners(const Player& a_box, glm::vec2& a_contact, int& a_numContact, float& a_pen, glm::vec2& a_edgeNormal);
 
 	float GetRadius() { return m_radius; }
 	glm::vec4 GetColour() { return m_colour; }
@@ -24,6 +36,7 @@ public:
 	glm::vec2 GetLocalY() { return m_localY; }
 
 protected:
+
 	float m_radius;
 	glm::vec4 m_colour;
 

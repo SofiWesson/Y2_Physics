@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
+RigidBody::RigidBody(ShapeType a_shapeID) : PhysicsObject(a_shapeID)
+{
+}
+
 RigidBody::RigidBody(
 	ShapeType a_shapeID, glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass) :
 	PhysicsObject(a_shapeID)

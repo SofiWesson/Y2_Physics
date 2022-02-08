@@ -2,6 +2,11 @@
 #include "Circle.h"
 #include <glm/ext.hpp>
 
+Circle::Circle() : RigidBody(CIRCLE)
+{
+
+}
+
 Circle::Circle(glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius, glm::vec4 a_colour) :
 	RigidBody(CIRCLE, a_position, a_velocity, 0, a_mass)
 {

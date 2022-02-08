@@ -4,6 +4,7 @@
 class Circle : public RigidBody
 {
 public:
+	Circle();
 	Circle(glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius, glm::vec4 a_colour);
 	~Circle();
 	virtual void MakeGizmo();

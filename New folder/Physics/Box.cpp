@@ -1,6 +1,11 @@
 #include "Box.h"
 #include <Gizmos.h>
 
+Box::Box() : RigidBody(BOX)
+{
+
+}
+
 Box::Box(glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass, float a_width, float a_height) :
 	RigidBody(BOX, a_position, a_velocity, a_rotation, a_mass)
 {
@@ -61,9 +66,10 @@ void Box::MakeGizmo()
 	aie::Gizmos::add2DTri(p1, p4, p3, m_colour);
 }
 
+// Problem with player box is this
 bool Box::CheckCorners(const Box& a_box, glm::vec2& a_contact, int& a_numContact, float& a_pen, glm::vec2& a_edgeNormal)
 {
-	float minX, maxX, minY, maxY;
+	float minX = 0, maxX = 0, minY = 0, maxY = 0;
 	float boxW = a_box.m_extents.x * 2;
 	float boxH = a_box.m_extents.y * 2;
 	int numLocalContacts = 0;

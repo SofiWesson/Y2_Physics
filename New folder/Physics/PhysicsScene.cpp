@@ -118,6 +118,10 @@ bool PhysicsScene::Plane2Box(PhysicsObject* a_plane, PhysicsObject* a_box)
 	Plane* plane = dynamic_cast<Plane*>(a_plane);
 	Box* box = dynamic_cast<Box*>(a_box);
 
+	Player* player = dynamic_cast<Player*>(a_box);
+	if (player != nullptr)
+		box = (Box*)a_box;
+
 	// When the arguments return true collision test
 	if (box != nullptr && plane != nullptr)
 	{
@@ -172,6 +176,10 @@ bool PhysicsScene::Circle2Plane(PhysicsObject* a_circle, PhysicsObject* a_plane)
 	Circle* circle = dynamic_cast<Circle*>(a_circle);
 	Plane* plane = dynamic_cast<Plane*>(a_plane);
 
+	Player* player = dynamic_cast<Player*>(a_circle);
+	if (player != nullptr)
+		circle = (Circle*)a_circle;
+
 	// if this is successful then test for a collision
 
 	if (circle != nullptr && plane != nullptr)
@@ -198,6 +206,14 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	// Tries to cast the object to circle to circle
 	Circle* circle1 = dynamic_cast<Circle*>(a_circle);
 	Circle* circle2 = dynamic_cast<Circle*>(a_otherCircle);
+
+	Player* player = dynamic_cast<Player*>(a_circle);
+	if (player != nullptr)
+		circle1 = (Circle*)a_circle;
+
+	player = dynamic_cast<Player*>(a_otherCircle);
+	if (player != nullptr)
+		circle2 = (Circle*)a_otherCircle;
 
 	// If successful then test for collision
 	if (circle1 != nullptr && circle2 != nullptr)
@@ -234,6 +250,14 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 {
 	Circle* circle = dynamic_cast<Circle*>(a_circle);
 	Box* box = dynamic_cast<Box*>(a_box);
+
+	Player* player = dynamic_cast<Player*>(a_circle);
+	if (player != nullptr)
+		circle = (Circle*)a_circle;
+
+	player = dynamic_cast<Player*>(a_box);
+	if (player != nullptr)
+		box = (Box*)a_box;
 
 	if (box != nullptr && circle != nullptr)
 	{
@@ -280,6 +304,14 @@ bool PhysicsScene::Box2Box(PhysicsObject* a_box, PhysicsObject* a_otherBox)
 	Box* box1 = dynamic_cast<Box*>(a_box);
 	Box* box2 = dynamic_cast<Box*>(a_otherBox);
 
+	Player* player = dynamic_cast<Player*>(a_box);
+	if (player != nullptr)
+		box1 = (Box*)a_box;
+
+	player = dynamic_cast<Player*>(a_otherBox);
+	if (player != nullptr)
+		box2 = (Box*)a_otherBox;
+
 	if (box1 != nullptr && box2 != nullptr)
 	{
 		glm::vec2 boxPos = box2->GetPosition() - box1->GetPosition();
@@ -287,6 +319,7 @@ bool PhysicsScene::Box2Box(PhysicsObject* a_box, PhysicsObject* a_otherBox)
 		glm::vec2 contact(0, 0);
 		float pen = 0;
 		int numContacts = 0;
+
 		box1->CheckCorners(*box2, contact, numContacts, pen, norm);
 		if (box2->CheckCorners(*box1, contact, numContacts, pen, norm))
 		{

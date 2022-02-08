@@ -7,6 +7,7 @@
 class RigidBody : public PhysicsObject
 {
 public:
+	RigidBody(ShapeType a_shapeID);
 	RigidBody(ShapeType a_shapeID, glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass);
 	~RigidBody();
 
@@ -28,10 +29,14 @@ public:
 	float GetKineticEnergy();
 
 	void SetMass(float a_mass) { m_mass = a_mass; }
+	//void SetCollider(RigidBody* a_shape) { m_collider = a_shape; }
 
 	float OpposingColour(float a_value);
 
 protected:
+
+	//ShapeType* m_collider;
+
 	glm::vec2 m_positon;
 	glm::vec2 m_velocity;
 	float m_rotation; // In 2D we only need a single float

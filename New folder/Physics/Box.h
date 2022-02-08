@@ -4,6 +4,7 @@
 class Box : public RigidBody
 {
 public:
+	Box();
 	Box(glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass, float a_width, float a_height);
 	Box(glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass, float a_width, float a_height, glm::vec4 a_colour);
 	Box(glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass, glm::vec2 a_dimensions);
@@ -22,6 +23,7 @@ public:
 	glm::vec2 GetLocalY() { return m_localY; }
 
 protected:
+
 	glm::vec2 m_extents; // The half edge lengths
 	glm::vec4 m_colour;
 
