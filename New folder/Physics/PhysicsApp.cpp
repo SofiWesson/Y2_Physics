@@ -50,11 +50,11 @@ bool PhysicsApp::startup() // game manager
 
 	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0));
 
-	Box* box1 = CreateBox(glm::vec2(0, 20), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
-	Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(1, 0, 1, 1), glm::vec2(0, 0));
+	//Box* box1 = CreateBox(glm::vec2(0, 20), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
+	//Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(1, 0, 1, 1), glm::vec2(0, 0));
 	
 	Circle* ball1 = CreateCircle(glm::vec2(0, 10), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, 0));
-	Circle* ball2 = CreateCircle(glm::vec2(0, 30),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0));
+	//Circle* ball2 = CreateCircle(glm::vec2(0, 30),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0));
 
 	//m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
 	m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box

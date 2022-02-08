@@ -35,7 +35,8 @@ public:
 
 protected:
 
-	//ShapeType* m_collider;
+	float m_linearDrag = 0.03f;
+	float m_angularDrag = 0.03f;
 
 	glm::vec2 m_positon;
 	glm::vec2 m_velocity;
