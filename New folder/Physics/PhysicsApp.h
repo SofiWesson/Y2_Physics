@@ -23,8 +23,6 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 
-	void PlayerControl(Player* a_player, aie::Input* a_input);
-
 protected:
 
 	aie::Renderer2D*	m_2dRenderer;
@@ -36,6 +34,7 @@ protected:
 	float timerReset = 0.1f;
 
 	Player* m_player;
+	Circle* m_ball;
 
 //====================
 public:

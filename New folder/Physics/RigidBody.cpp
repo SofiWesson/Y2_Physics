@@ -76,9 +76,7 @@ void RigidBody::ApplyForce(glm::vec2 a_force, glm::vec2 a_contact)
 
 float RigidBody::GetKineticEnergy()
 {
-	float totalEnergy = (m_mass * glm::dot(m_velocity, m_velocity)) / 2;
-	
-	return totalEnergy;
+	return 0.5f * (m_mass * glm::dot(m_velocity, m_velocity) + m_moment * m_angularVelocity * m_angularVelocity);
 }
 
 float RigidBody::OpposingColour(float a_value)

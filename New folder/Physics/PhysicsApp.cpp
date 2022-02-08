@@ -43,18 +43,21 @@ bool PhysicsApp::startup() // game manager
 	   but it will increase the processing time required. If it is too high
 	   it will cause the sim to stutter and reduce the stability */
 
-	m_physicsScene->SetGravity(glm::vec2(0, 0));
+	m_physicsScene->SetGravity(glm::vec2(0, -9.82f));
 	m_physicsScene->SetTimeStep(0.01f);
 
 	Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
 
-	Box* box = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 1, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
-	
-	Circle* ball1 = CreateCircle(glm::vec2(0, 20), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, -50));
-	// Circle* ball2 = CreateCircle(glm::vec2(10, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0));
+	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0));
 
-	// m_player = CreatePlayer(glm::vec2(10, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
-	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
+	Box* box1 = CreateBox(glm::vec2(0, 20), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
+	Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(1, 0, 1, 1), glm::vec2(0, 0));
+	
+	Circle* ball1 = CreateCircle(glm::vec2(0, 10), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, 0));
+	Circle* ball2 = CreateCircle(glm::vec2(0, 30),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0));
+
+	//m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
+	//m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
 	return true;
 }
@@ -74,8 +77,6 @@ void PhysicsApp::update(float deltaTime) {
 	
 	m_physicsScene->Update(deltaTime);
 	m_physicsScene->Draw();
-
-	PlayerControl(m_player, input);
 
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
@@ -103,21 +104,6 @@ void PhysicsApp::draw() {
 
 	// done drawing sprites
 	m_2dRenderer->end();
-}
-
-void PhysicsApp::PlayerControl(Player* a_player, aie::Input* a_input)
-{
-	if (a_input->isKeyDown(aie::INPUT_KEY_W))
-		a_player->ApplyForce(glm::vec2(0, 5.f), a_player->GetPosition());
-
-	if (a_input->isKeyDown(aie::INPUT_KEY_A))
-		a_player->ApplyForce(glm::vec2(-5.f, 0), a_player->GetPosition());
-
-	if (a_input->isKeyDown(aie::INPUT_KEY_S))
-		a_player->ApplyForce(glm::vec2(0, -5.f), a_player->GetPosition());
-
-	if (a_input->isKeyDown(aie::INPUT_KEY_D))
-		a_player->ApplyForce(glm::vec2(5.f, 0), a_player->GetPosition());
 }
 
 Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour, glm::vec2 a_force)

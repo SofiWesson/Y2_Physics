@@ -1,5 +1,6 @@
 #pragma once
 #include "Circle.h"
+#include <Input.h>
 
 class Player : public RigidBody
 {
@@ -10,6 +11,8 @@ public:
 
 	virtual void FixedUpdate(glm::vec2 a_gravity, float a_timeStep);
 	virtual void MakeGizmo();
+
+	void PlayerController(Player* a_player, aie::Input* a_input);
 
 	float GetRadius() { return m_radius; }
 	glm::vec4 GetColour() { return m_colour; }

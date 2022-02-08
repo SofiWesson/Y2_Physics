@@ -239,7 +239,7 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 	{
 		// Transform the circle into the box's coordinate space
 		glm::vec2 circlePosWorld = circle->GetPosition() - box->GetPosition();
-		glm::vec2 circlePosBox = glm::vec2(glm::dot(circlePosWorld, box->GetLocalX()), glm::dot(circlePosBox, box->GetLocalY()));
+		glm::vec2 circlePosBox = glm::vec2(glm::dot(circlePosWorld, box->GetLocalX()), glm::dot(circlePosWorld, box->GetLocalY()));
 
 		/* Then find the closest point to the circle center on the box, do this by clamping the coordinate in the box-space
 		   to the box's extents */
@@ -277,5 +277,28 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 
 bool PhysicsScene::Box2Box(PhysicsObject* a_box, PhysicsObject* a_otherBox)
 {
+	Box* box1 = dynamic_cast<Box*>(a_box);
+	Box* box2 = dynamic_cast<Box*>(a_otherBox);
+
+	if (box1 != nullptr && box2 != nullptr)
+	{
+		glm::vec2 boxPos = box2->GetPosition() - box1->GetPosition();
+		glm::vec2 norm(0, 0);
+		glm::vec2 contact(0, 0);
+		float pen = 0;
+		int numContacts = 0;
+		box1->CheckCorners(*box2, contact, numContacts, pen, norm);
+		if (box2->CheckCorners(*box1, contact, numContacts, pen, norm))
+		{
+			norm = -norm;
+		}
+
+		if (pen > 0)
+		{
+			box1->ResolveCollision(box2, contact / (float)numContacts, &norm);
+		}
+		return true;
+	}
+
 	return false;
 }
