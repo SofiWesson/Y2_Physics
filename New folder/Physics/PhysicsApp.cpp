@@ -2,11 +2,12 @@
 #include <Gizmos.h>
 #include <glm/ext.hpp>
 #include <Input.h>
-
-#include "PhysicsApp.h"
 #include "Texture.h"
 #include "Font.h"
 #include "Input.h"
+
+#include "Application.h"
+#include "PhysicsApp.h"
 #include "Circle.h"
 #include "Plane.h"
 #include "Player.h"
@@ -15,7 +16,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-PhysicsApp::PhysicsApp()
+PhysicsApp::PhysicsApp() : Application()
 {
 	
 }
@@ -59,6 +60,8 @@ bool PhysicsApp::startup() // game manager
 	//m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
 	m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
+	ObjectTest();
+
 	return true;
 }
 
@@ -81,29 +84,27 @@ void PhysicsApp::update(float deltaTime) {
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
+
+	MouseInputTest(input);
 }
 
-void PhysicsApp::draw() {
+void PhysicsApp::draw()
+{
+	
+}
 
-	// wipe the screen to the background colour
-	clearScreen();
+glm::vec2 PhysicsApp::ScreenToWorld(glm::vec2 a_screenPos)
+{
+	glm::vec2 worldPos = a_screenPos;
 
-	// begin drawing sprites
-	m_2dRenderer->begin();
+	// Move the center of the screen to (0, 0)
+	worldPos.x -= getWindowWidth() / 2;
+	worldPos.y -= getWindowHeight() / 2;
 
-	// draw your stuff here!
-	static float aspectRatio = 16.f / 9.f;
-	aie::Gizmos::draw2D(glm::ortho<float>(-100, 100, -100 / aspectRatio, 100 / aspectRatio, -1.f, 1.f));
+	worldPos.x *= 2.f * m_extents / getWindowWidth();
+	worldPos.y *= 2.f * m_extents / (m_aspectRatio * getWindowHeight());
 
-	char fps[32];
-	sprintf_s(fps, 32, "FPS: %i", getFPS());
-	m_2dRenderer->drawText(m_font, fps, 0, 720 - 32);
-
-	// output some text, uses the last used colour
-	m_2dRenderer->drawText(m_font, "Press ESC to quit", 0, 10);
-
-	// done drawing sprites
-	m_2dRenderer->end();
+	return worldPos;
 }
 
 Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour, glm::vec2 a_force)
@@ -124,7 +125,7 @@ Plane* PhysicsApp::CreatePlane(glm::vec2 a_normal, float a_distToOrigin, glm::ve
 	// Plane* testPlane3 = new Plane(glm::vec2(0, 1), -40,  glm::vec4(0, 1, 0, 1)); // bottom
 	// Plane* testPlane4 = new Plane(glm::vec2(1, 1), -32,  glm::vec4(0, 1, 0, 1)); // bottom left
 	// Plane* testPlane5 = new Plane(glm::vec2(-1, 1), -32, glm::vec4(0, 1, 0, 1)); // bottom right
-	// 
+
 	// m_physicsScene->AddActor(testPlane1);
 	// m_physicsScene->AddActor(testPlane2);
     // m_physicsScene->AddActor(testPlane3);
@@ -165,4 +166,45 @@ Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float 
 	box->ApplyForce(a_force, box->GetPosition());
 
 	return box;
+}
+
+void PhysicsApp::MouseInputTest(aie::Input* a_input)
+{
+	int screenX, screenY;
+
+	if (a_input->isMouseButtonDown(0))
+	{
+		a_input->getMouseXY(&screenX, &screenY);
+		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
+
+		aie::Gizmos::add2DCircle(worldPos, 5, 32, glm::vec4(.1f, .1f, .9f, 1.f));
+	}
+	if (a_input->wasMouseButtonReleased(0))
+	{
+		a_input->getMouseXY(&screenX, &screenY);
+		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
+		Circle* spawn = CreateCircle(worldPos, glm::vec2(0, 0), 4, 4, glm::vec4(.1f, .1f, .4f, 1.f), glm::vec2(0, 0));
+	}
+}
+
+void PhysicsApp::ObjectTest()
+{
+	Circle* ball1 = CreateCircle(glm::vec2(10, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.f, 1.f, 0.f, 1.f), glm::vec2(0, 0));
+	Circle* ball2 = CreateCircle(glm::vec2(10, -20), glm::vec2(0, 0), 4, 4, glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0, 0));
+	ball2->SetKinematic(true);
+	ball2->SetTrigger(true);
+
+	Plane* plane1 = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(1, 1, 1, 1));
+	Plane* plane2 = CreatePlane(glm::vec2(0, -1), -30, glm::vec4(1, 1, 1, 1));
+	Plane* plane3 = CreatePlane(glm::vec2(1, 0), -30, glm::vec4(1, 1, 1, 1));
+	Plane* plane4 = CreatePlane(glm::vec2(-1, 0), -30, glm::vec4(1, 1, 1, 1));
+
+	ball2->triggerEnter = [=](PhysicsObject* a_other)
+	{
+		std::cout << "Entered: " << a_other << std::endl;
+	};
+	ball2->triggerExit = [=](PhysicsObject* a_other)
+	{
+		std::cout << "Exited: " << a_other << std::endl;
+	};
 }

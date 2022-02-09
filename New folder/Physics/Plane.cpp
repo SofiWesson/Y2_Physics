@@ -1,5 +1,6 @@
 #include "Plane.h"
 #include "RigidBody.h"
+#include "PhysicsScene.h"
 
 #include <Gizmos.h>
 #include <glm/ext.hpp>
@@ -12,6 +13,7 @@ Plane::Plane(glm::vec2 a_normal, float a_distToOrigin, glm::vec4 a_colour) : Phy
 	m_colour = a_colour;
 	m_isKinematic = true;
 	m_elasticity = 1;
+	m_isTrigger = false;
 }
 
 Plane::Plane() : PhysicsObject(PLANE)
@@ -21,6 +23,7 @@ Plane::Plane() : PhysicsObject(PLANE)
 	m_colour = glm::vec4(1, 1, 1, 1);
 	m_isKinematic = true;
 	m_elasticity = 1;
+	m_isTrigger = false;
 }
 
 Plane::~Plane()
@@ -65,14 +68,21 @@ void Plane::ResolvePlaneCollision(RigidBody* a_rigidbody, glm::vec2 a_contact)
 	
 	float r = glm::dot(localContact, glm::vec2(m_normal.y, -m_normal.x));
 
-	/* determine the 'effective mass' - this is the combination of the moment of inertia and mass,
+	if (!m_isTrigger && !a_rigidbody->IsTrigger())
+	{
+		/* determine the 'effective mass' - this is the combination of the moment of inertia and mass,
 	   this will tell us how much the contact point velocity will change with the forces applied */
 
-	float eMass = 1.f / (1.f / a_rigidbody->GetMass() + (r * r) / a_rigidbody->GetMoment());
+		float eMass = 1.f / (1.f / a_rigidbody->GetMass() + (r * r) / a_rigidbody->GetMoment());
 
-	float j = -(1 + e) * velocityIntoPlane * eMass;
+		float j = -(1 + e) * velocityIntoPlane * eMass;
 
-	glm::vec2 force = m_normal * j;
+		glm::vec2 force = m_normal * j;
 
-	a_rigidbody->ApplyForce(force, a_contact - a_rigidbody->GetPosition());
+		a_rigidbody->ApplyForce(force, a_contact - a_rigidbody->GetPosition());
+
+		float pen = glm::dot(a_contact, m_normal) - m_distToOrigin;
+
+		PhysicsScene::ApplyContactForces(a_rigidbody, nullptr, m_normal, pen);
+	}
 }

@@ -1,4 +1,7 @@
 #include "RigidBody.h"
+#include "PhysicsScene.h"
+#include "PhysicsObject.h"
+
 #include <glm/glm.hpp>
 #include <Gizmos.h>
 #include <glm/ext.hpp>
@@ -26,6 +29,8 @@ RigidBody::RigidBody(
 	m_mass = a_mass;
 	m_elasticity = 1;
 	m_angularVelocity = 0;
+	m_isKinematic = false;
+	m_isTrigger = false;
 }
 
 RigidBody::~RigidBody()
@@ -35,6 +40,36 @@ RigidBody::~RigidBody()
 
 void RigidBody::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 {
+	if (m_isTrigger)
+	{
+		/* Check every object that is inside this objectand called triggerEnter on if they haven't
+		   registered inside of this frame, they had to of exited therefore we can remove them
+		   from out list and call triggerExit */
+
+		for (auto it = m_objectsInside.begin(); it != m_objectsInside.end(); it++)
+		{
+			if (std::find(m_objectsInsideThisFrame.begin(), m_objectsInsideThisFrame.end(), *it) == m_objectsInsideThisFrame.end())
+			{
+				if (triggerExit)
+				{
+					triggerExit(*it);
+					it = m_objectsInside.erase(it);
+					if (it == m_objectsInside.end())
+						break;
+				}
+			}
+		}
+	}
+	// clear the list now for the next frame
+	m_objectsInsideThisFrame.clear();
+
+	if (m_isKinematic)
+	{
+		m_velocity = glm::vec2(0, 0);
+		m_angularVelocity = 0;
+		return;
+	}
+
 	m_positon += GetVelocity() * a_timeStep;
 	ApplyForce(a_gravity * GetMass() * a_timeStep, glm::vec2(0, 0));
 
@@ -50,11 +85,14 @@ void RigidBody::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 		m_angularVelocity = 0;
 }
 
-void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal, float pen)
+void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal, float a_pen)
 {
+	// register that a collision has occured and these obejcts have overlapped
+	m_objectsInsideThisFrame.push_back(a_otherActor);
+	a_otherActor->m_objectsInsideThisFrame.push_back(this);
+
 	/* We need to find the vector between their centers or use the provided
 	   directional force, and make sure it is normalised */
-
 	glm::vec2 normal = glm::normalize(a_collisionNormal ? *a_collisionNormal :
 		a_otherActor->GetPosition() - m_positon);
 
@@ -69,18 +107,30 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 
 	if (cp_velocityThis > cp_velocityOther) // They are moving closer
 	{
-		/* this will calculate the effective mass at the contact point for each other
+		if (!m_isTrigger && !a_otherActor->m_isTrigger)
+		{
+			/* this will calculate the effective mass at the contact point for each other
 		   ie. How much the contact point  will move due to the forces applied */
 
-		float massThis = 1.f / (1.f / m_mass + glm::pow(radiusThis, 2.f) / m_moment);
-		float massOther = 1.f / (1.f / a_otherActor->GetMass() + glm::pow(radiusOther, 2.f) / a_otherActor->GetMoment());
+			float massThis = 1.f / (1.f / GetMass() + glm::pow(radiusThis, 2.f) / m_moment);
+			float massOther = 1.f / (1.f / a_otherActor->GetMass() + glm::pow(radiusOther, 2.f) / a_otherActor->GetMoment());
 
-		float elasticity = (m_elasticity + a_otherActor->GetElasticity()) / 2.f;
+			float elasticity = (m_elasticity + a_otherActor->GetElasticity()) / 2.f;
 
-		glm::vec2 impact = (1.f + elasticity) * massThis * massOther / (massThis + massOther) * (cp_velocityThis - cp_velocityOther) * normal;
+			glm::vec2 impact = (1.f + elasticity) * massThis * massOther / (massThis + massOther) * (cp_velocityThis - cp_velocityOther) * normal;
 
-		ApplyForce(-impact, a_contact - m_positon);
-		a_otherActor->ApplyForce(impact, a_contact - a_otherActor->GetPosition());
+			ApplyForce(-impact, a_contact - m_positon);
+			a_otherActor->ApplyForce(impact, a_contact - a_otherActor->GetPosition());
+		}
+		else
+		{
+			TriggerEnter(a_otherActor);
+			a_otherActor->TriggerEnter(this);
+		}
+	}
+	if (a_pen > 0)
+	{
+		PhysicsScene::ApplyContactForces(this, a_otherActor, normal, a_pen);
 	}
 }
 
@@ -93,6 +143,16 @@ void RigidBody::ApplyForce(glm::vec2 a_force, glm::vec2 a_contact)
 float RigidBody::GetKineticEnergy()
 {
 	return 0.5f * (m_mass * glm::dot(m_velocity, m_velocity) + m_moment * m_angularVelocity * m_angularVelocity);
+}
+
+void RigidBody::TriggerEnter(PhysicsObject* a_otherObject)
+{
+	if (m_isTrigger && std::find(m_objectsInside.begin(), m_objectsInside.end(), a_otherObject) == m_objectsInside.end())
+	{
+		m_objectsInside.push_back(a_otherObject);
+		if (triggerEnter != nullptr)
+			triggerEnter(a_otherObject);
+	}
 }
 
 float RigidBody::OpposingColour(float a_value)

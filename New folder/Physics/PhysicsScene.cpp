@@ -102,6 +102,21 @@ void PhysicsScene::CheckForCollisions()
 	}
 }
 
+void PhysicsScene::ApplyContactForces(RigidBody* a_rigidbody1, RigidBody* a_rigidbody2, glm::vec2 a_collosionNorm, float a_pen)
+{
+	if (a_rigidbody1 && a_rigidbody1->IsTrigger() ||
+		a_rigidbody2 && a_rigidbody2->IsTrigger())
+		return;
+
+	float rigidbody2Mass = a_rigidbody2 ? a_rigidbody2->GetMass() : INT_MAX;
+	float rigidbody1Factor = rigidbody2Mass / (a_rigidbody1->GetMass() + rigidbody2Mass);
+	a_rigidbody1->SetPosition(a_rigidbody1->GetPosition() - rigidbody1Factor * a_collosionNorm * a_pen);
+	if (a_rigidbody2 != nullptr)
+	{
+		a_rigidbody2->SetPosition(a_rigidbody2->GetPosition() + (1 - rigidbody1Factor) * a_collosionNorm * a_pen);
+	}
+}
+
 // =============================================== PLANE ===============================================
 bool PhysicsScene::Plane2Plane(PhysicsObject* a_plane, PhysicsObject* a_otherPlane)
 {
@@ -226,7 +241,7 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 
 		if (penetration > 0)
 		{
-			circle1->ResolveCollision(circle2, .5f * (circle1->GetPosition() + circle2->GetPosition()));
+			circle1->ResolveCollision(circle2, .5f * (circle1->GetPosition() + circle2->GetPosition()), nullptr, penetration);
 
 			return true;
 		}
@@ -290,7 +305,7 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 		{
 			glm::vec2 direction = glm::normalize(circleToBox);
 			glm::vec2 contact = closestPointInBoxWorld;
-			box->ResolveCollision(circle, contact, &direction);
+			box->ResolveCollision(circle, contact, &direction, penetration);
 
 			return true;
 		}
@@ -328,7 +343,7 @@ bool PhysicsScene::Box2Box(PhysicsObject* a_box, PhysicsObject* a_otherBox)
 
 		if (pen > 0)
 		{
-			box1->ResolveCollision(box2, contact / (float)numContacts, &norm);
+			box1->ResolveCollision(box2, contact / (float)numContacts, &norm, pen);
 		}
 		return true;
 	}

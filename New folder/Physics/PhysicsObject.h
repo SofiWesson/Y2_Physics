@@ -1,5 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <functional>
+#include <list>
 
 /* This is a pure abstract class. It will be used as a base for
    the derived classes that will use FixedUpdate */
@@ -23,8 +25,13 @@ public:
 
 	ShapeType GetShapeID() { return m_shapeID; }
 	float GetElasticity() { return m_elasticity; }
+	bool IsTrigger() { return m_isTrigger; }
 
 	void SetElasticity(float a_elsticity) { m_elasticity = a_elsticity; }
+	void SetTrigger(bool a_trigger) { m_isTrigger = a_trigger; }
+
+	std::function<void(PhysicsObject*)> triggerEnter;
+	std::function<void(PhysicsObject*)> triggerExit;
 
 protected:
 	PhysicsObject(ShapeType a_shapeID) : m_shapeID(a_shapeID) {}
@@ -32,4 +39,8 @@ protected:
 	ShapeType m_shapeID;
 	float m_elasticity;
 	bool m_isKinematic;
+	bool m_isTrigger;
+
+	std::list<PhysicsObject*> m_objectsInside;
+	std::list<PhysicsObject*> m_objectsInsideThisFrame;
 };

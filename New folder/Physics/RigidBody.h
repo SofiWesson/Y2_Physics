@@ -3,6 +3,7 @@
 #include "PhysicsObject.h"
 #include <iostream>
 #include <functional>
+#include <list>
 
 class RigidBody : public PhysicsObject
 {
@@ -21,21 +22,23 @@ public:
 	glm::vec2 GetPosition() { return m_positon; }
 	glm::vec2 GetVelocity() { return m_velocity; }
 	float GetRotation() { return m_rotation; }
-	float GetMass() { return m_mass; }
+	float GetMass() { return m_isKinematic ? INT_MAX : m_mass; }
 	float GetAngularVelocity() { return m_angularVelocity; }
 	float GetMoment() { return m_isKinematic ? INT_MAX : m_moment; }
 	bool GetIsKinematic() { return m_isKinematic; }
-
 	float GetKineticEnergy();
 
 	void SetMass(float a_mass) { m_mass = a_mass; }
-	//void SetCollider(RigidBody* a_shape) { m_collider = a_shape; }
+	void SetKinematic(bool a_state) { m_isKinematic = a_state; }
+	void SetPosition(glm::vec2 a_position) { m_positon = a_position; }
+
+	void TriggerEnter(PhysicsObject* a_otherObject);
 
 	float OpposingColour(float a_value);
 
 protected:
 
-	float m_linearDrag = 0.03f;
+	float m_linearDrag = 0.03f; // make getters and setters
 	float m_angularDrag = 0.03f;
 
 	glm::vec2 m_positon;
