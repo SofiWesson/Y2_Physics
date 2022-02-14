@@ -1,28 +1,26 @@
 #pragma once
 
-#include "../aieBootstrap-master/bootstrap/Application.h"
-#include "../aieBootstrap-master/Project2D/Application2D.h"
+#include "App.h"
 #include "Renderer2D.h"
 #include <Input.h>
 
 #include "PhysicsScene.h"
 #include "GameStateManager.h"
 
-class Application;
-class Application2D;
+class App;
 class Circle;
 class Plane;
 class Player;
 class Box;
 
-class PhysicsApp : public aie::Application
+class PhysicsApp
 {
 public:
 
 	PhysicsApp();
 	virtual ~PhysicsApp();
 
-	virtual bool startup();
+	virtual bool startup(App* a_app);
 	virtual void shutdown();
 
 	virtual void update(float deltaTime);
@@ -35,6 +33,7 @@ protected:
 	aie::Renderer2D*	m_2dRenderer;
 	aie::Font*			m_font;
 
+	App* m_app;
 	PhysicsScene* m_physicsScene;
 
 	float timer = 0.f;

@@ -6,8 +6,9 @@
 #include "Font.h"
 #include "Input.h"
 
-#include "Application.h"
+#include "App.h"
 #include "PhysicsApp.h"
+#include "PhysicsScene.h"
 #include "Circle.h"
 #include "Plane.h"
 #include "Player.h"
@@ -16,7 +17,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-PhysicsApp::PhysicsApp() : Application()
+PhysicsApp::PhysicsApp()
 {
 	
 }
@@ -26,8 +27,10 @@ PhysicsApp::~PhysicsApp()
 
 }
 
-bool PhysicsApp::startup() // game manager
+bool PhysicsApp::startup(App* a_app)
 {
+	m_app = a_app;
+
 	// Increase the 2d line count to maximise the number of objects we can draw
 
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
@@ -54,13 +57,13 @@ bool PhysicsApp::startup() // game manager
 	//Box* box1 = CreateBox(glm::vec2(0, 20), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
 	//Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(1, 0, 1, 1), glm::vec2(0, 0));
 	
-	Circle* ball1 = CreateCircle(glm::vec2(0, 10), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, 0));
-	//Circle* ball2 = CreateCircle(glm::vec2(0, 30),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0));
+	Circle* ball1 = CreateCircle(glm::vec2(10, 5), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0));
+	Circle* ball2 = CreateCircle(glm::vec2(-10, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0));
 
 	//m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
 	m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
-	ObjectTest();
+	// ObjectTest(); 
 
 	return true;
 }
@@ -81,10 +84,6 @@ void PhysicsApp::update(float deltaTime) {
 	m_physicsScene->Update(deltaTime);
 	m_physicsScene->Draw();
 
-	// exit the application
-	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
-		quit();
-
 	MouseInputTest(input);
 }
 
@@ -98,11 +97,11 @@ glm::vec2 PhysicsApp::ScreenToWorld(glm::vec2 a_screenPos)
 	glm::vec2 worldPos = a_screenPos;
 
 	// Move the center of the screen to (0, 0)
-	worldPos.x -= getWindowWidth() / 2;
-	worldPos.y -= getWindowHeight() / 2;
+	worldPos.x -= m_app->getWindowWidth() / 2;
+	worldPos.y -= m_app->getWindowHeight() / 2;
 
-	worldPos.x *= 2.f * m_extents / getWindowWidth();
-	worldPos.y *= 2.f * m_extents / (m_aspectRatio * getWindowHeight());
+	worldPos.x *= 2.f * m_extents / m_app->getWindowWidth();
+	worldPos.y *= 2.f * m_extents / (m_aspectRatio * m_app->getWindowHeight());
 
 	return worldPos;
 }
@@ -113,7 +112,7 @@ Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 
 	m_physicsScene->AddActor(circle);
 
-	circle->ApplyForce(a_force, circle->GetPosition());
+	circle->ApplyForce(a_force, a_pos);
 
 	return circle;
 }

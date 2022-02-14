@@ -30,6 +30,17 @@ bool GameStateManager::startup()
 
 void GameStateManager::shutdown()
 {
+	for (auto iter = m_states.begin(); iter != m_states.end(); iter++)
+	{
+		if (iter->second != nullptr)
+		{
+			iter->second->shutdown();
+			delete iter->second;
+		}
+	}
+
+	m_states.clear();
+	m_stack.clear();
 }
 
 void GameStateManager::update(float deltaTime)

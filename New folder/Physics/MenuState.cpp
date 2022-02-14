@@ -39,5 +39,12 @@ void MenuState::update(float dt)
 
 void MenuState::draw()
 {
+	m_app->clearScreen();
+
+	// begin drawing sprites
+	m_app->Get2DRenderer()->begin();
+
 	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Menu", 10, 30);
+
+	m_app->Get2DRenderer()->end();
 }

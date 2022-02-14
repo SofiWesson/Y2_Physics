@@ -19,4 +19,5 @@ public:
 
 protected:
 	App* m_app;
+
 };

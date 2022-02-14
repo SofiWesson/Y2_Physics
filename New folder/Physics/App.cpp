@@ -9,6 +9,7 @@
 #include <Gizmos.h>
 #include "Texture.h"
 #include "Font.h"
+#include <Input.h>
 
 App::App() : Application()
 {
@@ -34,8 +35,8 @@ bool App::startup()
 	m_GSM = new GameStateManager();
 
 	m_GSM->SetState("Menu", new MenuState(this));
-	// m_GSM->SetState("Play", new PlayState(this));
-	// m_GSM->SetState("Pause", new PauseState(this));
+	m_GSM->SetState("Play", new PlayState(this));
+	m_GSM->SetState("Pause", new PauseState(this));
 
 	m_GSM->PushState("Menu");
 
@@ -44,12 +45,18 @@ bool App::startup()
 
 void App::shutdown()
 {
+	m_GSM->shutdown();
 	delete m_GSM;
 }
 
 void App::update(float deltaTime)
 {
 	m_GSM->update(deltaTime);
+
+	aie::Input* input = aie::Input::getInstance();
+
+	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
+		quit();
 }
 
 void App::draw()
