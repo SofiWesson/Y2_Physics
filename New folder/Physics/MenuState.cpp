@@ -40,7 +40,7 @@ void MenuState::update(float dt)
 void MenuState::draw()
 {
 	m_app->clearScreen();
-
+	
 	// begin drawing sprites
 	m_app->Get2DRenderer()->begin();
 

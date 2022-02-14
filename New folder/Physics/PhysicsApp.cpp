@@ -54,14 +54,14 @@ bool PhysicsApp::startup(App* a_app)
 
 	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0));
 
-	//Box* box1 = CreateBox(glm::vec2(0, 20), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(0, 0, 1, 1), glm::vec2(0, 0));
-	//Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 8.f, 4.f, glm::vec4(1, 0, 1, 1), glm::vec2(0, 0));
+	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0));
+	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0));
 	
-	Circle* ball1 = CreateCircle(glm::vec2(10, 5), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0));
-	Circle* ball2 = CreateCircle(glm::vec2(-10, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0));
+	Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0));
+	Circle* ball2 = CreateCircle(glm::vec2(-20, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0));
 
-	//m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
-	m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
+	// m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
+	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
 	// ObjectTest(); 
 
@@ -74,8 +74,8 @@ void PhysicsApp::shutdown() {
 	delete m_2dRenderer;
 }
 
-void PhysicsApp::update(float deltaTime) {
-
+void PhysicsApp::update(float deltaTime) 
+{
 	// input example
 	aie::Input* input = aie::Input::getInstance();
 
@@ -112,7 +112,7 @@ Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 
 	m_physicsScene->AddActor(circle);
 
-	circle->ApplyForce(a_force, a_pos);
+	circle->ApplyForce(a_force, glm::vec2(0, 0));
 
 	return circle;
 }
@@ -162,7 +162,7 @@ Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float 
 
 	m_physicsScene->AddActor(box);
 
-	box->ApplyForce(a_force, box->GetPosition());
+	box->ApplyForce(a_force, glm::vec2(0, 0));
 
 	return box;
 }

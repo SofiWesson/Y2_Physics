@@ -32,8 +32,11 @@ public:
 	void SetTimeStep(const float a_timeStep) { m_timeStep = a_timeStep; }
 	float GetTimeStep() const { return m_timeStep; }
 
-	void CheckForCollisions();
+	// float GetDT() const { return m_myDT; }
+	// void SetDT(const float a_dt) { m_myDT = a_dt; }
 
+	void CheckForCollisions();
+	
 	static void ApplyContactForces(RigidBody* a_rigidbody1, RigidBody* a_rigidbody2,
 		glm::vec2 a_collosionNorm, float a_pen);
 
@@ -52,6 +55,7 @@ public:
 protected:
 	glm::vec2 m_gravity;
 	float m_timeStep;
+	float m_myDT;
 	
 	/* Stores all the physics objects in the scene we create
 	   as well as functions that will add or remove objects */

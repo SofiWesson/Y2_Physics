@@ -11,9 +11,13 @@ public:
 
 	float GetRadius() { return m_radius; }
 	glm::vec4 GetColour() { return m_colour; }
+	glm::vec2 GetVelocityLastFrame() { return m_velocityLastFrame; }
+
+	void SetVelocityLastFrame(glm::vec2 a_currentVelocity) { m_velocityLastFrame = a_currentVelocity; }
 
 protected:
 	float m_radius;
 	glm::vec4 m_colour;
+	glm::vec2 m_velocityLastFrame = glm::vec2(0, 0);
 
 };

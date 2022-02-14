@@ -57,4 +57,6 @@ public:
 	void ObjectTest();
 
 	bool m_keyPressed = false;
+
+	float sofi_DT;
 };
