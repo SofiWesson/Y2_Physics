@@ -90,6 +90,10 @@ void PhysicsScene::CheckForCollisions()
 			int shapeID1 = obj1->GetShapeID();
 			int shapeID2 = obj2->GetShapeID();
 
+			// We do this check to ensure we do not include a joint into our collision checks
+			if (shapeID1 < 0 || shapeID2 < 0)
+				continue;
+
 			/* Using the function pointer */
 			int functionIdx = (shapeID1 * SHAPE_COUNT) + shapeID2;
 			fn collisionFunctionPtr = collisionFunctionArray[functionIdx];
@@ -233,52 +237,30 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	// If successful then test for collision
 	if (circle1 != nullptr && circle2 != nullptr) // point of collision is torque // not normaising plane
 	{
-		double pi = 355 / 113;
-		//=========================== CIRCLE 1 ROTATION =====================================
-		float lengthOfRadius1 = glm::length(circle1->GetRadius());
-
-		glm::vec2 changeInVel1 = circle1->GetVelocity() - circle1->GetVelocityLastFrame();
-		
-		// make circle collision resolution, put this in there, get dt in circle first
-		// glm::vec2 acceleration1 = changeInVel1 / GetDT();
-		// glm::vec2(changeInVel1.x / m_myDT, changeInVel1.y / m_myDT);
-		// glm::vec2 force1 = circle1->GetMass() * acceleration1;
-		// float magnitudeForceVector1 = glm::length(force1);
-		// 
-		// float angle1 = circle1->GetRadius() * 180 / pi; // from radians to degrees
-		// 
-		// float torque1 = lengthOfRadius1 * magnitudeForceVector1 * sin(angle1);
-
-		//=========================== CIRCLE 2 ROTATION =====================================
-		// float lengthOfRadius2 = glm::length(circle2->GetRadius());
-		// 
-		// glm::vec2 changeInVel2 = circle2->GetVelocity() - circle2->GetVelocityLastFrame();
-		// 
-		// glm::vec2 acceleration2 = changeInVel2 / GetDT();
-		// glm::vec2 force2 = circle2->GetMass() * acceleration2;
-		// float magnitudeForceVector2 = glm::length(force2);
-		// 
-		// float angle2 = circle2->GetRadius() * 180 / pi; // from radians to degrees
-		// 
-		// float torque2 = lengthOfRadius2 * magnitudeForceVector2 * sin(angle2);
-		
-		//=========================== Collision Math =====================================
 		// Do the maths to change for the overlap
 		float dist = glm::distance(circle1->GetPosition(), circle2->GetPosition());
 
 		// if the circles touch, reseolve the colluision.
-		float penetration = circle2->GetRadius() + circle2->GetRadius() - dist;
+		float penetration = circle1->GetRadius() + circle2->GetRadius() - dist;
 
 		if (penetration > 0)
 		{
+			if (circle1->GetVelocity().x == 0 && circle1->GetVelocity().y == 0 &&
+				circle2->GetVelocity().x == 0 && circle2->GetVelocity().y == 0)
+			{
+				circle1->SetVelocityLastFrame(circle1->GetVelocity());
+				circle2->SetVelocityLastFrame(circle2->GetVelocity());
+			}
+
 			glm::vec2 contact = circle1->GetPosition() + circle2->GetPosition();
-			circle1->ResolveCollision(circle2, contact, nullptr, penetration);
+			circle1->ResolveCircleCollision(circle2, 0.5f * contact, nullptr, penetration);
 
 			return true;
 		}
-
-		circle1->SetVelocityLastFrame(circle1->GetVelocity());
 	}
+
+	circle1->SetVelocityLastFrame(circle1->GetVelocity());
+	circle2->SetVelocityLastFrame(circle2->GetVelocity());
 
 	return false;
 }

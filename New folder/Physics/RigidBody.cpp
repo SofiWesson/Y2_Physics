@@ -140,6 +140,11 @@ void RigidBody::ApplyForce(glm::vec2 a_force, glm::vec2 a_contact)
 	m_angularVelocity += (a_force.y * a_contact.x - a_force.x * a_contact.y) / GetMoment();
 }
 
+glm::vec2 RigidBody::ToWorld(glm::vec2 a_localPos)
+{
+	return m_positon + m_localX * a_localPos.x + m_localY * a_localPos.y;
+}
+
 float RigidBody::GetKineticEnergy()
 {
 	return 0.5f * (m_mass * glm::dot(m_velocity, m_velocity) + m_moment * m_angularVelocity * m_angularVelocity);

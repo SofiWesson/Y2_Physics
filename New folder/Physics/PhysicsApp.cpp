@@ -13,6 +13,7 @@
 #include "Plane.h"
 #include "Player.h"
 #include "Box.h"
+#include "Spring.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -47,23 +48,54 @@ bool PhysicsApp::startup(App* a_app)
 	   but it will increase the processing time required. If it is too high
 	   it will cause the sim to stutter and reduce the stability */
 
-	m_physicsScene->SetGravity(glm::vec2(0, -9.82f));
+	m_physicsScene->SetGravity(glm::vec2(0, 0));
 	m_physicsScene->SetTimeStep(0.01f);
 
-	Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
+	// Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
 
 	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0));
 
 	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0));
 	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0));
 	
-	Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0));
-	Circle* ball2 = CreateCircle(glm::vec2(-20, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0));
+	// Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0));
+	// ball1->SetRotation(20.f);
+	// Circle* ball2 = CreateCircle(glm::vec2(-20, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0));
 
 	// m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
 	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
+	// CreateSpring(10);
+
 	// ObjectTest(); 
+
+	Circle* circle = nullptr;
+
+	float circleRadius = 2.f;
+
+	float xStart = 40.f;
+	float yStart = 10.f;
+
+	float xOffset = 5.f;
+	float yOffset = 5.f;
+
+	
+	for (int x = 0; x < 5; x++)
+	{
+		for (int y = 0; y < 5 - x; y++)
+		{
+			float xPos = xStart - (xOffset * x);
+			float yPos = 1 + yStart - (yOffset / 2 * x) - (2 / circleRadius + yOffset * y);
+
+			glm::vec2 pos = glm::vec2(xPos, yPos);
+			glm::vec4 colour;
+
+			colour = glm::vec4(0, 0, 1, 1);
+
+			circle = new Circle(pos, glm::vec2(0), 4, circleRadius, colour);
+			m_physicsScene->AddActor(circle);
+		}
+	}
 
 	return true;
 }
@@ -154,6 +186,30 @@ Player* PhysicsApp::CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, 
 	m_physicsScene->AddActor(player);
 
 	return player;
+}
+
+void PhysicsApp::CreateSpring(int a_amount)
+{
+	Circle* prev = nullptr;
+	for (int i = 0; i < a_amount; i++)
+	{
+		// Spawn new circle below the last
+		Circle* circle = new Circle(glm::vec2(i * 3, 20 - i * 5), glm::vec2(0, 0), 10.f, 2.f, glm::vec4(0, 0, 1, 1));
+		
+		if (i == 0)
+			circle->SetKinematic(true);
+
+		m_physicsScene->AddActor(circle);
+		if (prev)
+			m_physicsScene->AddActor(new Spring(circle, prev, 10, 500));
+
+		prev = circle;
+	}
+
+	// Add a kinematic box
+	// Box* box = new Box(glm::vec2(0, -20), glm::vec2(0, 0), .3f, 20, glm::vec2(8, 2), glm::vec4(0, 1, 1, 1));
+	// box->SetKinematic(true);
+	// m_physicsScene->AddActor(box);
 }
 
 Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force)

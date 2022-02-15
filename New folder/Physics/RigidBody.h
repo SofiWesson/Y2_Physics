@@ -19,6 +19,8 @@ public:
 
 	void ApplyForce(glm::vec2 a_force, glm::vec2 a_contact);
 
+	glm::vec2 ToWorld(glm::vec2 a_localPos);
+
 	glm::vec2 GetPosition() { return m_positon; }
 	glm::vec2 GetVelocity() { return m_velocity; }
 	float GetRotation() { return m_rotation; }
@@ -31,6 +33,8 @@ public:
 	void SetMass(float a_mass) { m_mass = a_mass; }
 	void SetKinematic(bool a_state) { m_isKinematic = a_state; }
 	void SetPosition(glm::vec2 a_position) { m_positon = a_position; }
+	void SetMoment(float a_moment) { m_moment += a_moment; }
+	void SetRotation(float a_rot) { m_angularVelocity = a_rot; }
 
 	void TriggerEnter(PhysicsObject* a_otherObject);
 
@@ -47,6 +51,10 @@ protected:
 	float m_mass;
 	float m_angularVelocity;
 	float m_moment;
+
+	// We will store the local x and y axes of the box based on its angle of rotation
+	glm::vec2 m_localX;
+	glm::vec2 m_localY;
 
 };
 

@@ -53,6 +53,7 @@ public:
 	Box* CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force);
 	Player* CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour);
 	Player* CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour);
+	void CreateSpring(int a_amount); // make proper constructor later
 	void MouseInputTest(aie::Input* a_input);
 	void ObjectTest();
 

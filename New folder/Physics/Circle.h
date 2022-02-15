@@ -7,6 +7,7 @@ public:
 	Circle();
 	Circle(glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius, glm::vec4 a_colour);
 	~Circle();
+	virtual void update(float a_dt);
 	virtual void MakeGizmo();
 
 	float GetRadius() { return m_radius; }
@@ -15,9 +16,13 @@ public:
 
 	void SetVelocityLastFrame(glm::vec2 a_currentVelocity) { m_velocityLastFrame = a_currentVelocity; }
 
+	void ResolveCircleCollision(Circle* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal, float a_pen);
+
 protected:
 	float m_radius;
 	glm::vec4 m_colour;
 	glm::vec2 m_velocityLastFrame = glm::vec2(0, 0);
+
+	float m_dt;
 
 };

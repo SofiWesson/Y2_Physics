@@ -8,6 +8,7 @@
 
 enum ShapeType
 {
+	JOINT = -1,
 	PLANE = 0,
 	CIRCLE,
 	BOX,
@@ -33,6 +34,9 @@ public:
 	std::function<void(PhysicsObject*)> triggerEnter;
 	std::function<void(PhysicsObject*)> triggerExit;
 
+	std::list<PhysicsObject*> m_objectsInside;
+	std::list<PhysicsObject*> m_objectsInsideThisFrame;
+
 protected:
 	PhysicsObject(ShapeType a_shapeID) : m_shapeID(a_shapeID) {}
 
@@ -40,7 +44,4 @@ protected:
 	float m_elasticity;
 	bool m_isKinematic;
 	bool m_isTrigger;
-
-	std::list<PhysicsObject*> m_objectsInside;
-	std::list<PhysicsObject*> m_objectsInsideThisFrame;
 };
