@@ -69,33 +69,34 @@ bool PhysicsApp::startup(App* a_app)
 
 	// ObjectTest(); 
 
-	Circle* circle = nullptr;
-
-	float circleRadius = 2.f;
-
-	float xStart = 40.f;
-	float yStart = 10.f;
-
-	float xOffset = 5.f;
-	float yOffset = 5.f;
-
-	
-	for (int x = 0; x < 5; x++)
-	{
-		for (int y = 0; y < 5 - x; y++)
-		{
-			float xPos = xStart - (xOffset * x);
-			float yPos = 1 + yStart - (yOffset / 2 * x) - (2 / circleRadius + yOffset * y);
-
-			glm::vec2 pos = glm::vec2(xPos, yPos);
-			glm::vec4 colour;
-
-			colour = glm::vec4(0, 0, 1, 1);
-
-			circle = new Circle(pos, glm::vec2(0), 4, circleRadius, colour);
-			m_physicsScene->AddActor(circle);
-		}
-	}
+	// ============================================ POOL BALL SPAWN ============================================ // put in own function // enum with 4 different ball types
+	// Circle* circle = nullptr;
+	// 
+	// float circleRadius = 2.f;
+	// 
+	// float xStart = 40.f;
+	// float yStart = 10.f;
+	// 
+	// float xOffset = 5.f;
+	// float yOffset = 5.f;
+	// 
+	// 
+	// for (int x = 0; x < 5; x++)
+	// {
+	// 	for (int y = 0; y < 5 - x; y++)
+	// 	{
+	// 		float xPos = xStart - (xOffset * x);
+	// 		float yPos = 1 + yStart - (yOffset / 2 * x) - (2 / circleRadius + yOffset * y);
+	// 
+	// 		glm::vec2 pos = glm::vec2(xPos, yPos);
+	// 		glm::vec4 colour;
+	// 
+	// 		colour = glm::vec4(0, 0, 1, 1);
+	// 
+	// 		circle = new Circle(pos, glm::vec2(0), 4, circleRadius, colour);
+	// 		m_physicsScene->AddActor(circle);
+	// 	}
+	// }
 
 	return true;
 }
