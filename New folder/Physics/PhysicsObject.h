@@ -15,6 +15,14 @@ enum ShapeType
 	SHAPE_COUNT
 };
 
+enum BallType
+{
+	SOLID,
+	STRIPES,
+	EIGHTBALL,
+	CUEBALL
+};
+
 class PhysicsObject
 {
 public:

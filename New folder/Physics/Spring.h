@@ -23,7 +23,7 @@ public:
 	glm::vec2 GetContact2() { return m_actor2 ? m_actor2->ToWorld(m_contact2) : m_contact2; }
 	glm::vec2 GetContact(int a_side) { return a_side == 1 ? m_contact1 : m_contact2; }
 
-private:
+protected:
 	RigidBody* m_actor1;
 	RigidBody* m_actor2;
 
@@ -36,4 +36,3 @@ private:
 	float m_springCoefficient;
 
 };
-

@@ -14,6 +14,7 @@
 #include "Player.h"
 #include "Box.h"
 #include "Spring.h"
+#include "Softbody.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -48,10 +49,12 @@ bool PhysicsApp::startup(App* a_app)
 	   but it will increase the processing time required. If it is too high
 	   it will cause the sim to stutter and reduce the stability */
 
-	m_physicsScene->SetGravity(glm::vec2(0, 0));
+	m_physicsScene->SetGravity(glm::vec2(0, -9.82f));
 	m_physicsScene->SetTimeStep(0.01f);
 
-	// Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
+	// SoftbodyTest();
+
+	Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
 
 	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0));
 
@@ -67,36 +70,9 @@ bool PhysicsApp::startup(App* a_app)
 
 	// CreateSpring(10);
 
-	// ObjectTest(); 
+	// RackBalls();
 
-	// ============================================ POOL BALL SPAWN ============================================ // put in own function // enum with 4 different ball types
-	// Circle* circle = nullptr;
-	// 
-	// float circleRadius = 2.f;
-	// 
-	// float xStart = 40.f;
-	// float yStart = 10.f;
-	// 
-	// float xOffset = 5.f;
-	// float yOffset = 5.f;
-	// 
-	// 
-	// for (int x = 0; x < 5; x++)
-	// {
-	// 	for (int y = 0; y < 5 - x; y++)
-	// 	{
-	// 		float xPos = xStart - (xOffset * x);
-	// 		float yPos = 1 + yStart - (yOffset / 2 * x) - (2 / circleRadius + yOffset * y);
-	// 
-	// 		glm::vec2 pos = glm::vec2(xPos, yPos);
-	// 		glm::vec4 colour;
-	// 
-	// 		colour = glm::vec4(0, 0, 1, 1);
-	// 
-	// 		circle = new Circle(pos, glm::vec2(0), 4, circleRadius, colour);
-	// 		m_physicsScene->AddActor(circle);
-	// 	}
-	// }
+	// ObjectTest(); 
 
 	return true;
 }
@@ -211,6 +187,91 @@ void PhysicsApp::CreateSpring(int a_amount)
 	// Box* box = new Box(glm::vec2(0, -20), glm::vec2(0, 0), .3f, 20, glm::vec2(8, 2), glm::vec4(0, 1, 1, 1));
 	// box->SetKinematic(true);
 	// m_physicsScene->AddActor(box);
+}
+
+void PhysicsApp::RackBalls()
+{
+	// ============================================ POOL BALL SPAWN ============================================ // enum with 4 different ball types
+	Circle* circle = nullptr;
+	
+	glm::vec2 vel = glm::vec2(0, 0);
+	float mass = 4;
+
+	float circleRadius = 2.f;
+	
+	float xStart = 40.f;
+	float yStart = 10.f;
+	
+	float xOffset = 5.f;
+	float yOffset = 5.f;
+
+	glm::vec4 colour;
+	glm::vec4 yellow = glm::vec4(1, 0.8f, 0, 1);
+	glm::vec4 red = glm::vec4(1, 0, 0, 1);
+	glm::vec4 black = glm::vec4(1, 1, 1, 1); // change background to green // change to black later
+	
+	for (int x = 0; x < 5; x++)
+	{
+		for (int y = 0; y < 5 - x; y++)
+		{
+			float xPos = xStart - (xOffset * x);
+			float yPos = 1 + yStart - (yOffset / 2 * x) - (2 / circleRadius + yOffset * y);
+	
+			glm::vec2 pos = glm::vec2(xPos, yPos);
+			
+			if (x == 0)
+			{
+				if (y == 0 || y == 1 || y == 3)
+					colour = yellow;
+				else
+					colour = red;
+			}
+			else if (x == 1)
+			{
+				if (y == 1 || y == 3)
+					colour = yellow;
+				else
+					colour = red;
+			}
+			else if (x == 2)
+			{
+				if (y == 0)
+					colour = yellow;
+				else if (y == 1)
+					colour = black;
+				else
+					colour = red;
+			}
+			else if (x == 3)
+			{
+				if (y == 1)
+					colour = yellow;
+				else
+					colour = red;
+			}
+			else
+				colour = red;
+
+			circle = new Circle(pos, vel, mass, circleRadius, colour);
+			m_physicsScene->AddActor(circle);
+		}
+	}
+}
+
+void PhysicsApp::SoftbodyTest()
+{
+	std::vector<std::string> sb;
+	sb.push_back("0000.|.000000.|.00....|.000000");
+	sb.push_back("0000.|.000000.|.00....|.000000");
+	sb.push_back("..00.|.00..00.|.00....|...00..");
+	sb.push_back("..00.|.00..00.|.00....|...00..");
+	sb.push_back("0000.|.00..00.|.00000.|...00..");
+	sb.push_back("0000.|.00..00.|.00000.|...00..");
+	sb.push_back("00...|.00..00.|.00....|...00..");
+	sb.push_back("00...|.00..00.|.00....|...00..");
+	sb.push_back("0000.|.000000.|.00000.|.000000");
+	sb.push_back("0000.|.000000.|.00000.|.000000");
+	Softbody::Build(m_physicsScene, glm::vec2(-80, 0), 5, 2000, 1, sb);
 }
 
 Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force)
