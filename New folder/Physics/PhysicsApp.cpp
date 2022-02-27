@@ -49,28 +49,32 @@ bool PhysicsApp::startup(App* a_app)
 	   but it will increase the processing time required. If it is too high
 	   it will cause the sim to stutter and reduce the stability */
 
-	m_physicsScene->SetGravity(glm::vec2(0, -9.82f));
+	m_physicsScene->SetGravity(glm::vec2(0, 0));
 	m_physicsScene->SetTimeStep(0.01f);
+
+	CreateTable();
+
+	RackBalls();
 
 	// SoftbodyTest();
 
-	Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
+	// Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
 
-	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0));
+	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0), false, false);
 
-	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0));
-	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0));
+	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0), false, false);
+	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0), false, false);
 	
-	// Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0));
+	// Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0), false, false);
 	// ball1->SetRotation(20.f);
-	// Circle* ball2 = CreateCircle(glm::vec2(-20, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0));
+	// Circle* ball2 = CreateCircle(glm::vec2(-20, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0), false, false);
 
 	// m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
 	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
 	// CreateSpring(10);
 
-	// RackBalls();
+	
 
 	// ObjectTest(); 
 
@@ -115,9 +119,13 @@ glm::vec2 PhysicsApp::ScreenToWorld(glm::vec2 a_screenPos)
 	return worldPos;
 }
 
-Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour, glm::vec2 a_force)
+Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour, glm::vec2 a_force, bool a_isKinematic, bool a_isTrigger, bool a_canCollide)
 {
 	Circle* circle = new Circle(a_pos, a_vel, a_mass, a_radius, a_colour);
+
+	circle->SetKinematic(a_isKinematic);
+	circle->SetTrigger(a_isTrigger);
+	circle->SetCollider(a_canCollide);
 
 	m_physicsScene->AddActor(circle);
 
@@ -128,23 +136,26 @@ Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 
 Plane* PhysicsApp::CreatePlane(glm::vec2 a_normal, float a_distToOrigin, glm::vec4 a_colour)
 {
-	// Plane* testPlane1 = new Plane(glm::vec2(1, 0), -40,  glm::vec4(0, 1, 0, 1)); // left
-	// Plane* testPlane2 = new Plane(glm::vec2(-1, 0), -40, glm::vec4(0, 1, 0, 1)); // right
-	// Plane* testPlane3 = new Plane(glm::vec2(0, 1), -40,  glm::vec4(0, 1, 0, 1)); // bottom
-	// Plane* testPlane4 = new Plane(glm::vec2(1, 1), -32,  glm::vec4(0, 1, 0, 1)); // bottom left
-	// Plane* testPlane5 = new Plane(glm::vec2(-1, 1), -32, glm::vec4(0, 1, 0, 1)); // bottom right
-
-	// m_physicsScene->AddActor(testPlane1);
-	// m_physicsScene->AddActor(testPlane2);
-    // m_physicsScene->AddActor(testPlane3);
-	// m_physicsScene->AddActor(testPlane4);
-	// m_physicsScene->AddActor(testPlane5);
-
 	Plane* plane = new Plane(a_normal, a_distToOrigin, a_colour);
 
 	m_physicsScene->AddActor(plane);
 
 	return plane;
+}
+
+Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force, bool a_isKinematic, bool a_isTrigger, bool a_canCollide)
+{
+	Box* box = new Box(a_pos, a_vel, a_rot, a_mass, a_width, a_height, a_colour);
+
+	box->SetKinematic(a_isKinematic);
+	box->SetTrigger(a_isTrigger);
+	box->SetCollider(a_canCollide);
+
+	m_physicsScene->AddActor(box);
+
+	box->ApplyForce(a_force, glm::vec2(0, 0));
+
+	return box;
 }
 
 Player* PhysicsApp::CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour)
@@ -189,6 +200,163 @@ void PhysicsApp::CreateSpring(int a_amount)
 	// m_physicsScene->AddActor(box);
 }
 
+void PhysicsApp::CreateTable()
+{
+	glm::vec2 pos = glm::vec2(0, 0);
+	glm::vec2 vel = glm::vec2(0, 0);
+	float rot = 0.f;
+	float mass = 0.f;
+	float width = 100.f;
+	float height = 50.f;
+	glm::vec4 baseColour = glm::vec4(.14f, .48f, .18f, 1);
+	glm::vec2 force = glm::vec2(0, 0);
+
+	float edgeSize = 5;
+	glm::vec4 edgeColour = glm::vec4(.5f, .3f, .04f, 1);
+	bool isEdgeTrigger = false;
+
+	float socketDiameter = 4.5f;
+
+	Box* tableBase = CreateBox(pos, vel, rot, mass, width, height, baseColour, force, true, false, false);
+
+	// table north edge // left, right
+	Box* tableNorthLeftEdge = CreateBox(
+		glm::vec2(pos.x - (width / 4),
+				  pos.y + height / 2 + edgeSize / 2),
+		vel,
+		rot,
+		mass,
+		width / 2 - socketDiameter,
+		edgeSize,
+		edgeColour,
+		force,
+		true, false, true);
+	
+	Box* tableNorthRightEdge = CreateBox(
+		glm::vec2(pos.x + (width / 4),
+				  pos.y + height / 2 + edgeSize / 2),
+		vel,
+		rot,
+		mass,
+		width / 2 - socketDiameter,
+		edgeSize,
+		edgeColour,
+		force,
+		true, false, true);
+	
+	// table south edge // left, right
+	Box* tableSouthLeftEdge = CreateBox(
+		glm::vec2(pos.x - (width / 4),
+				  pos.y - height / 2 - edgeSize / 2),
+		vel,
+		rot,
+		mass,
+		width / 2 - socketDiameter,
+		edgeSize,
+		edgeColour,
+		force,
+		true, false, true);
+	
+	Box* tableSouthRightEdge = CreateBox(
+		glm::vec2(pos.x + (width / 4),
+				  pos.y - height / 2 - edgeSize / 2),
+		vel,
+		rot,
+		mass,
+		width / 2 - socketDiameter,
+		edgeSize,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// table left edge
+	Box* tableWestEdge = CreateBox(
+		glm::vec2(pos.x - width / 2 - edgeSize / 2,
+				  pos.y),
+		vel,
+		rot,
+		mass,
+		edgeSize,
+		height - socketDiameter,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// table right edge
+	Box* tableEastEdge = CreateBox(
+		glm::vec2(pos.x + width / 2 + edgeSize / 2,
+				  pos.y),
+		vel,
+		rot,
+		mass,
+		edgeSize,
+		height - socketDiameter,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// sockets
+	Circle* socketNorth = CreateCircle(
+		glm::vec2(pos.x,
+				  pos.y + height / 2 + socketDiameter / 2),
+		vel,
+		mass,
+		socketDiameter / 2,
+		glm::vec4(.2f, .2f, .2f, 1),
+		force,
+		true, false, true);
+	
+	Circle* socketSouth = CreateCircle(
+		glm::vec2(pos.x,
+				  pos.y - height / 2 - socketDiameter / 2),
+		vel,
+		mass,
+		socketDiameter / 2,
+		glm::vec4(.2f, .2f, .2f, 1),
+		force,
+		true, false, true);
+	
+	Circle* socketNW = CreateCircle(
+		glm::vec2(pos.x - width / 2 + edgeSize / 2 - socketDiameter / 2,
+				  pos.y + height / 2 - edgeSize / 2 + socketDiameter / 2),
+		vel,
+		mass,
+		socketDiameter / 2,
+		glm::vec4(.2f, .2f, .2f, 1),
+		force,
+		true, false, true);
+
+	Circle* socketSW = CreateCircle(
+		glm::vec2(pos.x - width / 2 + edgeSize / 2 - socketDiameter / 2,
+				  pos.y - height / 2 + edgeSize / 2 - socketDiameter / 2),
+		vel,
+		mass,
+		socketDiameter / 2,
+		glm::vec4(.2f, .2f, .2f, 1),
+		force,
+		true, false, true);
+
+	Circle* socketNE = CreateCircle(
+		glm::vec2(pos.x + width / 2 - edgeSize / 2 + socketDiameter / 2,
+				  pos.y + height / 2 - edgeSize / 2 + socketDiameter / 2),
+		vel,
+		mass,
+		socketDiameter / 2,
+		glm::vec4(.2f, .2f, .2f, 1),
+		force,
+		true, false, true);
+
+	Circle* socketSE = CreateCircle(
+		glm::vec2(pos.x + width / 2 - edgeSize / 2 + socketDiameter / 2,
+			      pos.y - height / 2 + edgeSize / 2 - socketDiameter / 2),
+		vel,
+		mass,
+		socketDiameter / 2,
+		glm::vec4(.2f, .2f, .2f, 1),
+		force,
+		true, false, true);
+}
+
 void PhysicsApp::RackBalls()
 {
 	// ============================================ POOL BALL SPAWN ============================================ // enum with 4 different ball types
@@ -208,7 +376,8 @@ void PhysicsApp::RackBalls()
 	glm::vec4 colour;
 	glm::vec4 yellow = glm::vec4(1, 0.8f, 0, 1);
 	glm::vec4 red = glm::vec4(1, 0, 0, 1);
-	glm::vec4 black = glm::vec4(1, 1, 1, 1); // change background to green // change to black later
+	glm::vec4 black = glm::vec4(0, 0, 0, 1);
+	glm::vec4 white = glm::vec4(1, 1, 1, 1);
 	
 	for (int x = 0; x < 5; x++)
 	{
@@ -252,10 +421,12 @@ void PhysicsApp::RackBalls()
 			else
 				colour = red;
 
-			circle = new Circle(pos, vel, mass, circleRadius, colour);
-			m_physicsScene->AddActor(circle);
+			circle = CreateCircle(pos, vel, mass, circleRadius, colour, glm::vec2(0, 0), false, false, true);
 		}
 	}
+
+	// cue ball
+	circle = CreateCircle(glm::vec2(-25, 0), vel, mass, circleRadius, white, glm::vec2(0, 0), false, false, true);
 }
 
 void PhysicsApp::SoftbodyTest()
@@ -274,17 +445,6 @@ void PhysicsApp::SoftbodyTest()
 	Softbody::Build(m_physicsScene, glm::vec2(-80, 0), 5, 2000, 1, sb);
 }
 
-Box* PhysicsApp::CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force)
-{
-	Box* box = new Box(a_pos, a_vel, a_rot, a_mass, a_width, a_height, a_colour);
-
-	m_physicsScene->AddActor(box);
-
-	box->ApplyForce(a_force, glm::vec2(0, 0));
-
-	return box;
-}
-
 void PhysicsApp::MouseInputTest(aie::Input* a_input)
 {
 	int screenX, screenY;
@@ -300,14 +460,14 @@ void PhysicsApp::MouseInputTest(aie::Input* a_input)
 	{
 		a_input->getMouseXY(&screenX, &screenY);
 		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
-		Circle* spawn = CreateCircle(worldPos, glm::vec2(0, 0), 4, 4, glm::vec4(.1f, .1f, .4f, 1.f), glm::vec2(0, 0));
+		Circle* spawn = CreateCircle(worldPos, glm::vec2(0, 0), 4, 4, glm::vec4(.1f, .1f, .4f, 1.f), glm::vec2(0, 0), false, false, true);
 	}
 }
 
 void PhysicsApp::ObjectTest()
 {
-	Circle* ball1 = CreateCircle(glm::vec2(10, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.f, 1.f, 0.f, 1.f), glm::vec2(0, 0));
-	Circle* ball2 = CreateCircle(glm::vec2(10, -20), glm::vec2(0, 0), 4, 4, glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0, 0));
+	Circle* ball1 = CreateCircle(glm::vec2(10, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.f, 1.f, 0.f, 1.f), glm::vec2(0, 0), false, false, true);
+	Circle* ball2 = CreateCircle(glm::vec2(10, -20), glm::vec2(0, 0), 4, 4, glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0, 0), false, false, true);
 	ball2->SetKinematic(true);
 	ball2->SetTrigger(true);
 

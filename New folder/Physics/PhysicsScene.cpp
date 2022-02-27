@@ -144,6 +144,9 @@ bool PhysicsScene::Plane2Box(PhysicsObject* a_plane, PhysicsObject* a_box)
 	// When the arguments return true collision test
 	if (box != nullptr && plane != nullptr)
 	{
+		if (!box->CanCollide() || !plane->CanCollide())
+			return false;
+
 		int numContacts = 0;
 		glm::vec2 contact(0, 0);
 		float contactV = 0;
@@ -203,6 +206,9 @@ bool PhysicsScene::Circle2Plane(PhysicsObject* a_circle, PhysicsObject* a_plane)
 
 	if (circle != nullptr && plane != nullptr)
 	{
+		if (!circle->CanCollide() || !plane->CanCollide())
+			return false;
+
 		glm::vec2 collisionNormal = plane->GetNormal();
 		float circleToPlane = glm::dot(circle->GetPosition(), plane->GetNormal()) - plane->GetDistance();
 		float intersection = circle->GetRadius() - circleToPlane;
@@ -237,6 +243,9 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	// If successful then test for collision
 	if (circle1 != nullptr && circle2 != nullptr) // point of collision is torque // not normaising plane
 	{
+		if (!circle1->CanCollide() || !circle2->CanCollide())
+			return false;
+
 		// Do the maths to change for the overlap
 		float dist = glm::distance(circle1->GetPosition(), circle2->GetPosition());
 
@@ -291,6 +300,9 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 
 	if (box != nullptr && circle != nullptr)
 	{
+		if (!box->CanCollide() || !circle->CanCollide())
+			return false;
+
 		// Transform the circle into the box's coordinate space
 		glm::vec2 circlePosWorld = circle->GetPosition() - box->GetPosition();
 		glm::vec2 circlePosBox = glm::vec2(glm::dot(circlePosWorld, box->GetLocalX()), glm::dot(circlePosWorld, box->GetLocalY()));
@@ -344,6 +356,9 @@ bool PhysicsScene::Box2Box(PhysicsObject* a_box, PhysicsObject* a_otherBox)
 
 	if (box1 != nullptr && box2 != nullptr)
 	{
+		if (!box1->CanCollide() || !box2->CanCollide())
+			return false;
+
 		glm::vec2 boxPos = box2->GetPosition() - box1->GetPosition();
 		glm::vec2 norm(0, 0);
 		glm::vec2 contact(0, 0);

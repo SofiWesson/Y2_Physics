@@ -35,9 +35,11 @@ public:
 	ShapeType GetShapeID() { return m_shapeID; }
 	float GetElasticity() { return m_elasticity; }
 	bool IsTrigger() { return m_isTrigger; }
+	bool CanCollide() { return m_canCollide; }
 
 	void SetElasticity(float a_elsticity) { m_elasticity = a_elsticity; }
 	void SetTrigger(bool a_trigger) { m_isTrigger = a_trigger; }
+	void SetCollider(bool a_canCollder) { m_canCollide = a_canCollder; }
 
 	std::function<void(PhysicsObject*)> triggerEnter;
 	std::function<void(PhysicsObject*)> triggerExit;
@@ -52,4 +54,5 @@ protected:
 	float m_elasticity;
 	bool m_isKinematic;
 	bool m_isTrigger;
+	bool m_canCollide;
 };
