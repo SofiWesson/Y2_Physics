@@ -125,14 +125,28 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 			// 	SetVelocity(glm::vec2(0, 0));
 
 			/* this will calculate the effective mass at the contact point for each other
-		   ie. How much the contact point  will move due to the forces applied */
+		   ie. How much the contact point will move due to the forces applied */
 
-			float massThis = 1.f / (1.f / GetMass() + glm::pow(radiusThis, 2.f) / m_moment);
-			float massOther = 1.f / (1.f / a_otherActor->GetMass() + glm::pow(radiusOther, 2.f) / a_otherActor->GetMoment());
+			float massThis = 0.f;
+			float massOther = 0.f;
+			float elasticity = 0.f;
+			glm::vec2 impact = glm::vec2(0, 0);
 
-			float elasticity = (m_elasticity + a_otherActor->GetElasticity()) / 2.f;
+			if (!GetIsKinematic() && !a_otherActor->GetIsKinematic())
+			{
+				massThis = 1.f / (1.f / GetMass() + glm::pow(radiusThis, 2.f) / m_moment);
+				massOther = 1.f / (1.f / a_otherActor->GetMass() + glm::pow(radiusOther, 2.f) / a_otherActor->GetMoment());
 
-			glm::vec2 impact = (1.f + elasticity) * massThis * massOther / (massThis + massOther) * (cp_velocityThis - cp_velocityOther) * normal;
+				elasticity = (m_elasticity + a_otherActor->GetElasticity()) / 2.f;
+
+				impact = (1.f + elasticity) * massThis * massOther / (massThis + massOther) * (cp_velocityThis - cp_velocityOther) * normal;
+			}
+			
+			if (GetIsKinematic())
+			{
+				// copy ResolvePlaneCollision eMass, j, and force for this and a_otherActor
+			}
+
 
 			ApplyForce(-impact, a_contact - m_positon);
 			a_otherActor->ApplyForce(impact, a_contact - a_otherActor->GetPosition());

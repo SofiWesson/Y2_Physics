@@ -46,6 +46,7 @@ protected:
 
 	Ball* m_cue;
 	glm::vec2 m_cueForceVectorStart = glm::vec2(0, 0);
+	glm::vec2 m_cueForce = glm::vec2(0, 0);
 
 	const float m_extents = 100;
 	const float m_aspectRatio = 16.f / 9.f;

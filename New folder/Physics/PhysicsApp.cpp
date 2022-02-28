@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Font.h"
 #include "Input.h"
+#include <Windows.h>
 
 #include "App.h"
 #include "PhysicsApp.h"
@@ -443,6 +444,8 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 {
 	int screenX, screenY;
 
+	glm::vec2 forceVector;
+
 	if (a_input->isMouseButtonDown(0))
 	{
 		a_input->getMouseXY(&screenX, &screenY);
@@ -453,12 +456,21 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 
 		glm::vec2 cuePos = m_cue->GetPosition();
 
-		aie::Gizmos::add2DLine(cuePos, cuePos + (m_cueForceVectorStart - worldPos), glm::vec4(1, 0.5f, 0, 1)); // clamp // on release set cue velocity to forcevector
+		forceVector = glm::vec2(m_cueForceVectorStart - worldPos);
+		float forceVectorLength = glm::length(forceVector);
+		forceVectorLength = glm::clamp(forceVectorLength, 0.f, 20.f);
+
+		float angle = atan2f(forceVector.y, forceVector.x);
+		glm::vec2 end = glm::vec2(std::cos(angle), std::sin(angle)) * forceVectorLength;
+
+		aie::Gizmos::add2DLine(cuePos, cuePos + end, glm::vec4(1, 0.5f, 0, 1)); // on release set cue velocity to forcevector
+
+		m_cueForce = forceVector * 20.f;
 	}
 	if (a_input->wasMouseButtonReleased(0))
 	{
 		m_cueForceVectorStart = glm::vec2(0, 0);
-		//Circle* spawn = CreateCircle(worldPos, glm::vec2(0, 0), 4, 4, glm::vec4(.1f, .1f, .4f, 1.f), glm::vec2(0, 0), false, false, true);
+		m_cue->ApplyForce(m_cueForce, glm::vec2(0, 0));
 	}
 }
 
