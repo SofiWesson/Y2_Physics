@@ -5,7 +5,7 @@ class Ball : public Circle
 {
 public:
 	Ball();
-	Ball(BallType a_ballType, glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius, glm::vec4 a_colour);
+	Ball(BallType a_ballType, glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius);
 	~Ball();
 
 	virtual void update(float a_dt);

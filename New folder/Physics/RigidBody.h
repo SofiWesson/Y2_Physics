@@ -35,6 +35,7 @@ public:
 	void SetPosition(glm::vec2 a_position) { m_positon = a_position; }
 	void SetMoment(float a_moment) { m_moment += a_moment; }
 	void SetRotation(float a_rot) { m_angularVelocity = a_rot; }
+	void SetVelocity(glm::vec2 a_vel) { m_velocity = a_vel; }
 
 	void TriggerEnter(PhysicsObject* a_otherObject);
 

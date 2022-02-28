@@ -93,8 +93,18 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 
 	/* We need to find the vector between their centers or use the provided
 	   directional force, and make sure it is normalised */
-	glm::vec2 normal = glm::normalize(a_collisionNormal ? *a_collisionNormal :
-		a_otherActor->GetPosition() - m_positon);
+	// glm::vec2 normal = glm::normalize(a_collisionNormal != nullptr ? *a_collisionNormal :
+	// 	a_otherActor->GetPosition() - m_positon);
+
+	glm::vec2 normal;
+
+	if (a_collisionNormal == nullptr)
+		if (a_otherActor->GetPosition() - m_positon == glm::vec2(0, 0))
+			normal = glm::vec2(0.1f, 0);
+		else
+			normal = glm::normalize(a_otherActor->GetPosition() - m_positon);
+	else
+		normal = glm::normalize(*a_collisionNormal);
 
 	/* Get the perpendicular vector to the collision normal */
 	glm::vec2 perpendicualColNorm(normal.y, -normal.x);
@@ -105,10 +115,15 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 	float cp_velocityThis = glm::dot(m_velocity, normal) - radiusThis * m_angularVelocity;
 	float cp_velocityOther = glm::dot(a_otherActor->GetVelocity(), normal) + radiusOther * a_otherActor->GetAngularVelocity();
 
-	if (cp_velocityThis > cp_velocityOther) // They are moving closer
+	if (cp_velocityThis >= cp_velocityOther) // They are moving closer
 	{
 		if (!m_isTrigger && !a_otherActor->m_isTrigger)
 		{
+			// if (a_otherActor->GetIsKinematic())
+			// 	a_otherActor->SetVelocity(glm::vec2(0, 0));
+			// else if (GetIsKinematic())
+			// 	SetVelocity(glm::vec2(0, 0));
+
 			/* this will calculate the effective mass at the contact point for each other
 		   ie. How much the contact point  will move due to the forces applied */
 
@@ -127,10 +142,11 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 			TriggerEnter(a_otherActor);
 			a_otherActor->TriggerEnter(this);
 		}
-	}
-	if (a_pen > 0)
-	{
-		PhysicsScene::ApplyContactForces(this, a_otherActor, normal, a_pen);
+
+		if (a_pen > 0)
+		{
+			PhysicsScene::ApplyContactForces(this, a_otherActor, normal, a_pen);
+		}
 	}
 }
 
@@ -162,23 +178,6 @@ void RigidBody::TriggerEnter(PhysicsObject* a_otherObject)
 
 float RigidBody::OpposingColour(float a_value)
 {
-	// percentile to rgb
-	float rgbValue = glm::round(a_value * 255);
-
-	// convert rgb to hex values
-	float fHexValue = rgbValue / 16;
-	int hex1Value = glm::round(fHexValue);
-	int hex2Value = (fHexValue - hex1Value) * 16;
-
-	// invert hex values
-	hex1Value = 15 - hex1Value;
-	hex2Value = 15 - hex2Value;
-
-	// convert hex values back into rgb
-	rgbValue = (hex1Value * 16) + hex2Value;
-
-	// convert rgb back into percentile
-	float percentile = rgbValue / 255;
-
-	return percentile;
+	// invert value
+	return 1.0f - a_value;
 }

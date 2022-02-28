@@ -15,6 +15,7 @@
 #include "Box.h"
 #include "Spring.h"
 #include "Softbody.h"
+#include "Ball.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -65,16 +66,13 @@ bool PhysicsApp::startup(App* a_app)
 	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0), false, false);
 	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0), false, false);
 	
-	// Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(-20.f, 0), false, false);
-	// ball1->SetRotation(20.f);
-	// Circle* ball2 = CreateCircle(glm::vec2(-20, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(20, 0), false, false);
+	// Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, 0), true, false, true);
+	// Circle* ball2 = CreateCircle(glm::vec2(0, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0), false, false, true);
 
 	// m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
 	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
 
 	// CreateSpring(10);
-
-	
 
 	// ObjectTest(); 
 
@@ -97,7 +95,8 @@ void PhysicsApp::update(float deltaTime)
 	m_physicsScene->Update(deltaTime);
 	m_physicsScene->Draw();
 
-	MouseInputTest(input);
+	HitCueBall(input);
+	// MouseInputTest(input);
 }
 
 void PhysicsApp::draw()
@@ -132,6 +131,21 @@ Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 	circle->ApplyForce(a_force, glm::vec2(0, 0));
 
 	return circle;
+}
+
+Ball* PhysicsApp::CreateBall(BallType a_ballType, glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec2 a_force, bool a_isKinematic, bool a_isTrigger, bool a_canCollide)
+{
+	Ball* ball= new Ball(a_ballType, a_pos, a_vel, a_mass, a_radius);
+
+	ball->SetKinematic(a_isKinematic);
+	ball->SetTrigger(a_isTrigger);
+	ball->SetCollider(a_canCollide);
+
+	m_physicsScene->AddActor(ball);
+
+	ball->ApplyForce(a_force, glm::vec2(0, 0));
+
+	return ball;
 }
 
 Plane* PhysicsApp::CreatePlane(glm::vec2 a_normal, float a_distToOrigin, glm::vec4 a_colour)
@@ -296,7 +310,7 @@ void PhysicsApp::CreateTable()
 		true, false, true);
 
 	// sockets
-	Circle* socketNorth = CreateCircle(
+	/*Circle* socketNorth = CreateCircle(
 		glm::vec2(pos.x,
 				  pos.y + height / 2 + socketDiameter / 2),
 		vel,
@@ -354,13 +368,13 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);
+		true, false, true);*/
 }
 
 void PhysicsApp::RackBalls()
 {
 	// ============================================ POOL BALL SPAWN ============================================ // enum with 4 different ball types
-	Circle* circle = nullptr;
+	Ball* ball = nullptr;
 	
 	glm::vec2 vel = glm::vec2(0, 0);
 	float mass = 4;
@@ -373,11 +387,7 @@ void PhysicsApp::RackBalls()
 	float xOffset = 5.f;
 	float yOffset = 5.f;
 
-	glm::vec4 colour;
-	glm::vec4 yellow = glm::vec4(1, 0.8f, 0, 1);
-	glm::vec4 red = glm::vec4(1, 0, 0, 1);
-	glm::vec4 black = glm::vec4(0, 0, 0, 1);
-	glm::vec4 white = glm::vec4(1, 1, 1, 1);
+	BallType ballType;
 	
 	for (int x = 0; x < 5; x++)
 	{
@@ -391,42 +401,65 @@ void PhysicsApp::RackBalls()
 			if (x == 0)
 			{
 				if (y == 0 || y == 1 || y == 3)
-					colour = yellow;
+					ballType = SOLID;
 				else
-					colour = red;
+					ballType = STRIPES;
 			}
 			else if (x == 1)
 			{
 				if (y == 1 || y == 3)
-					colour = yellow;
+					ballType = SOLID;
 				else
-					colour = red;
+					ballType = STRIPES;
 			}
 			else if (x == 2)
 			{
 				if (y == 0)
-					colour = yellow;
+					ballType = SOLID;
 				else if (y == 1)
-					colour = black;
+					ballType = EIGHTBALL;
 				else
-					colour = red;
+					ballType = STRIPES;
 			}
 			else if (x == 3)
 			{
 				if (y == 1)
-					colour = yellow;
+					ballType = SOLID;
 				else
-					colour = red;
+					ballType = STRIPES;
 			}
 			else
-				colour = red;
+				ballType = STRIPES;
 
-			circle = CreateCircle(pos, vel, mass, circleRadius, colour, glm::vec2(0, 0), false, false, true);
+			ball = CreateBall(ballType, pos, vel, mass, circleRadius, glm::vec2(0, 0), false, false, true);
 		}
 	}
 
 	// cue ball
-	circle = CreateCircle(glm::vec2(-25, 0), vel, mass, circleRadius, white, glm::vec2(0, 0), false, false, true);
+	m_cue = CreateBall(CUEBALL, glm::vec2(-25, 0), vel, mass, circleRadius, glm::vec2(0, 0), false, false, true);
+}
+
+void PhysicsApp::HitCueBall(aie::Input* a_input)
+{
+	int screenX, screenY;
+
+	if (a_input->isMouseButtonDown(0))
+	{
+		a_input->getMouseXY(&screenX, &screenY);
+		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
+
+		if (m_cueForceVectorStart == glm::vec2(0, 0))
+			m_cueForceVectorStart = worldPos;
+
+		glm::vec2 cuePos = m_cue->GetPosition();
+
+		aie::Gizmos::add2DLine(cuePos, cuePos + (m_cueForceVectorStart - worldPos), glm::vec4(1, 0.5f, 0, 1)); // clamp // on release set cue velocity to forcevector
+	}
+	if (a_input->wasMouseButtonReleased(0))
+	{
+		m_cueForceVectorStart = glm::vec2(0, 0);
+		//Circle* spawn = CreateCircle(worldPos, glm::vec2(0, 0), 4, 4, glm::vec4(.1f, .1f, .4f, 1.f), glm::vec2(0, 0), false, false, true);
+	}
 }
 
 void PhysicsApp::SoftbodyTest()

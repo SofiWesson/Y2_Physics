@@ -232,13 +232,13 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	Circle* circle1 = dynamic_cast<Circle*>(a_circle);
 	Circle* circle2 = dynamic_cast<Circle*>(a_otherCircle);
 
-	Player* player = dynamic_cast<Player*>(a_circle);
-	if (player != nullptr)
-		circle1 = (Circle*)a_circle;
-
-	player = dynamic_cast<Player*>(a_otherCircle);
-	if (player != nullptr)
-		circle2 = (Circle*)a_otherCircle;
+	// Player* player = dynamic_cast<Player*>(a_circle);
+	// if (player != nullptr)
+	// 	circle1 = (Circle*)a_circle;
+	// 
+	// player = dynamic_cast<Player*>(a_otherCircle);
+	// if (player != nullptr)
+	// 	circle2 = (Circle*)a_otherCircle;
 
 	// If successful then test for collision
 	if (circle1 != nullptr && circle2 != nullptr) // point of collision is torque // not normaising plane
@@ -262,7 +262,8 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 			}
 
 			glm::vec2 contact = circle1->GetPosition() + circle2->GetPosition();
-			circle1->ResolveCircleCollision(circle2, 0.5f * contact, nullptr, penetration);
+			//circle1->ResolveCircleCollision(circle2, 0.5f * contact, nullptr, penetration);
+			circle1->ResolveCollision(circle2, 0.5f * contact, nullptr, penetration);
 
 			return true;
 		}
@@ -274,7 +275,7 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	return false;
 }
 
-bool PhysicsScene::Circle2Box(PhysicsObject* a_circle, PhysicsObject* a_box)
+bool PhysicsScene::Circle2Box(PhysicsObject* a_circle, PhysicsObject* a_box) 
 {
 	return Box2Circle(a_box, a_circle);
 }
@@ -285,18 +286,18 @@ bool PhysicsScene::Box2Plane(PhysicsObject* a_box, PhysicsObject* a_plane)
 	return Plane2Box(a_plane, a_box);
 }
 
-bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
+bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle) // check extents against radius
 {
 	Circle* circle = dynamic_cast<Circle*>(a_circle);
 	Box* box = dynamic_cast<Box*>(a_box);
 
-	Player* player = dynamic_cast<Player*>(a_circle);
-	if (player != nullptr)
-		circle = (Circle*)a_circle;
-
-	player = dynamic_cast<Player*>(a_box);
-	if (player != nullptr)
-		box = (Box*)a_box;
+	// Player* player = dynamic_cast<Player*>(a_circle);
+	// if (player != nullptr)
+	// 	circle = (Circle*)a_circle;
+	// 
+	// player = dynamic_cast<Player*>(a_box);
+	// if (player != nullptr)
+	// 	box = (Box*)a_box;
 
 	if (box != nullptr && circle != nullptr)
 	{
@@ -330,7 +331,18 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle)
 
 		if (penetration > 0)
 		{
-			glm::vec2 direction = glm::normalize(circleToBox);
+			glm::vec2 direction;
+
+			if (circleToBox == glm::vec2(0, 0))
+			{
+				if (extents.x >= extents.y)
+					direction = glm::vec2(0, 0.1f);
+				else
+					direction = glm::vec2(0.1f, 0);
+			}
+			else
+				direction = glm::normalize(circleToBox);
+
 			glm::vec2 contact = closestPointInBoxWorld;
 			box->ResolveCollision(circle, contact, &direction, penetration);
 
