@@ -230,10 +230,13 @@ void PhysicsApp::CreateTable()
 	glm::vec4 edgeColour = glm::vec4(.5f, .3f, .04f, 1);
 	bool isEdgeTrigger = false;
 
-	float socketDiameter = 4.5f;
+	float socketDiameter = 5.5f;
+
+	std::list<Circle*> triggers;
 
 	Box* tableBase = CreateBox(pos, vel, rot, mass, width, height, baseColour, force, true, false, false);
 
+	// ===================================================================== EDGES ===================================================================== // edges need resize
 	// table north edge // left, right
 	Box* tableNorthLeftEdge = CreateBox(
 		glm::vec2(pos.x - (width / 4),
@@ -241,7 +244,7 @@ void PhysicsApp::CreateTable()
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter,
+		width / 2 - socketDiameter - edgeSize,
 		edgeSize,
 		edgeColour,
 		force,
@@ -253,7 +256,7 @@ void PhysicsApp::CreateTable()
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter,
+		width / 2 - socketDiameter - edgeSize,
 		edgeSize,
 		edgeColour,
 		force,
@@ -266,7 +269,7 @@ void PhysicsApp::CreateTable()
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter,
+		width / 2 - socketDiameter - edgeSize,
 		edgeSize,
 		edgeColour,
 		force,
@@ -278,7 +281,7 @@ void PhysicsApp::CreateTable()
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter,
+		width / 2 - socketDiameter - edgeSize,
 		edgeSize,
 		edgeColour,
 		force,
@@ -292,7 +295,7 @@ void PhysicsApp::CreateTable()
 		rot,
 		mass,
 		edgeSize,
-		height - socketDiameter,
+		height - socketDiameter - edgeSize,
 		edgeColour,
 		force,
 		true, false, true);
@@ -305,13 +308,138 @@ void PhysicsApp::CreateTable()
 		rot,
 		mass,
 		edgeSize,
-		height - socketDiameter,
+		height - socketDiameter - edgeSize,
 		edgeColour,
 		force,
 		true, false, true);
 
-	// sockets
-	/*Circle* socketNorth = CreateCircle(
+	// ===================================================================== SOCKET ENTERANCES =====================================================================
+	// north
+	Circle* northLeftLeft = CreateCircle(
+		glm::vec2(tableNorthLeftEdge->GetPosition().x - tableNorthLeftEdge->GetWidth() / 2,
+			tableNorthLeftEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* northLeftRight = CreateCircle(
+		glm::vec2(tableNorthLeftEdge->GetPosition().x + tableNorthLeftEdge->GetWidth() / 2,
+			tableNorthLeftEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* northRightLeft = CreateCircle(
+		glm::vec2(tableNorthRightEdge->GetPosition().x - tableNorthRightEdge->GetWidth() / 2,
+			tableNorthRightEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* northRightRight = CreateCircle(
+		glm::vec2(tableNorthRightEdge->GetPosition().x + tableNorthRightEdge->GetWidth() / 2,
+			tableNorthRightEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// south
+	Circle* southLeftLeft = CreateCircle(
+		glm::vec2(tableSouthLeftEdge->GetPosition().x - tableSouthLeftEdge->GetWidth() / 2,
+			tableSouthLeftEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* southLeftRight = CreateCircle(
+		glm::vec2(tableSouthLeftEdge->GetPosition().x + tableSouthLeftEdge->GetWidth() / 2,
+			tableSouthLeftEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* southRightLeft = CreateCircle(
+		glm::vec2(tableSouthRightEdge->GetPosition().x - tableSouthRightEdge->GetWidth() / 2,
+			tableSouthRightEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* southRightRight = CreateCircle(
+		glm::vec2(tableSouthRightEdge->GetPosition().x + tableSouthRightEdge->GetWidth() / 2,
+			tableSouthRightEdge->GetPosition().y),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// west
+	Circle* westUp = CreateCircle(
+		glm::vec2(tableWestEdge->GetPosition().x,
+			tableWestEdge->GetPosition().y + tableWestEdge->GetHeight() / 2),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* westDown = CreateCircle(
+		glm::vec2(tableWestEdge->GetPosition().x,
+			tableWestEdge->GetPosition().y - tableWestEdge->GetHeight() / 2),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// east
+	Circle* eastUp = CreateCircle(
+		glm::vec2(tableEastEdge->GetPosition().x,
+			tableEastEdge->GetPosition().y + tableEastEdge->GetHeight() / 2),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	Circle* eastDown = CreateCircle(
+		glm::vec2(tableEastEdge->GetPosition().x,
+			tableEastEdge->GetPosition().y - tableEastEdge->GetHeight() / 2),
+		vel,
+		mass,
+		edgeSize / 2,
+		edgeColour,
+		force,
+		true, false, true);
+
+	// ===================================================================== SOCKETS =====================================================================
+	Circle* socketNorth = CreateCircle(
 		glm::vec2(pos.x,
 				  pos.y + height / 2 + socketDiameter / 2),
 		vel,
@@ -319,7 +447,9 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);
+		true, true, true);
+
+	triggers.push_back(socketNorth);
 	
 	Circle* socketSouth = CreateCircle(
 		glm::vec2(pos.x,
@@ -329,7 +459,9 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);
+		true, true, true);
+
+	triggers.push_back(socketSouth);
 	
 	Circle* socketNW = CreateCircle(
 		glm::vec2(pos.x - width / 2 + edgeSize / 2 - socketDiameter / 2,
@@ -339,7 +471,9 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);
+		true, true, true);
+
+	triggers.push_back(socketNW);
 
 	Circle* socketSW = CreateCircle(
 		glm::vec2(pos.x - width / 2 + edgeSize / 2 - socketDiameter / 2,
@@ -349,7 +483,9 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);
+		true, true, true);
+
+	triggers.push_back(socketSW);
 
 	Circle* socketNE = CreateCircle(
 		glm::vec2(pos.x + width / 2 - edgeSize / 2 + socketDiameter / 2,
@@ -359,7 +495,9 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);
+		true, true, true);
+
+	triggers.push_back(socketNE);
 
 	Circle* socketSE = CreateCircle(
 		glm::vec2(pos.x + width / 2 - edgeSize / 2 + socketDiameter / 2,
@@ -369,7 +507,18 @@ void PhysicsApp::CreateTable()
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, false, true);*/
+		true, true, true);
+
+	triggers.push_back(socketSE);
+
+	// give sockets triggers
+	for (auto trigger : triggers)
+	{
+		trigger->triggerEnter = [=](PhysicsObject* a_other)
+		{
+			std::cout << "socketNorth Entered: " << a_other << std::endl;
+		};
+	}
 }
 
 void PhysicsApp::RackBalls()
@@ -433,11 +582,15 @@ void PhysicsApp::RackBalls()
 				ballType = STRIPES;
 
 			ball = CreateBall(ballType, pos, vel, mass, circleRadius, glm::vec2(0, 0), false, false, true);
+			ball->SetLinearDrag(0.45f);
+			m_balls.push_back(ball);
 		}
 	}
 
 	// cue ball
 	m_cue = CreateBall(CUEBALL, glm::vec2(-25, 0), vel, mass, circleRadius, glm::vec2(0, 0), false, false, true);
+	m_cue->SetLinearDrag(0.45f);
+	m_balls.push_back(m_cue);
 }
 
 void PhysicsApp::HitCueBall(aie::Input* a_input)
@@ -448,29 +601,47 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 
 	if (a_input->isMouseButtonDown(0))
 	{
-		a_input->getMouseXY(&screenX, &screenY);
-		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
+		for (auto ball : m_balls)
+		{
+			if (ball->GetVelocity().x > 0.15f || ball->GetVelocity().x < -0.15f &&
+				ball->GetVelocity().y > 0.15f || ball->GetVelocity().y < -0.15f)
+			{
+				m_ballsStatic = false;
+				break;
+			}
+			if (ball == m_balls.back())
+				m_ballsStatic = true;
+		}
 
-		if (m_cueForceVectorStart == glm::vec2(0, 0))
-			m_cueForceVectorStart = worldPos;
+		if (m_ballsStatic)
+		{
+			a_input->getMouseXY(&screenX, &screenY);
+			glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
 
-		glm::vec2 cuePos = m_cue->GetPosition();
+			if (m_cueForceVectorStart == glm::vec2(0, 0))
+				m_cueForceVectorStart = worldPos;
 
-		forceVector = glm::vec2(m_cueForceVectorStart - worldPos);
-		float forceVectorLength = glm::length(forceVector);
-		forceVectorLength = glm::clamp(forceVectorLength, 0.f, 20.f);
+			glm::vec2 cuePos = m_cue->GetPosition();
 
-		float angle = atan2f(forceVector.y, forceVector.x);
-		glm::vec2 end = glm::vec2(std::cos(angle), std::sin(angle)) * forceVectorLength;
+			forceVector = glm::vec2(m_cueForceVectorStart - worldPos);
+			float forceVectorLength = glm::length(forceVector);
+			forceVectorLength = glm::clamp(forceVectorLength, 0.f, 20.f);
 
-		aie::Gizmos::add2DLine(cuePos, cuePos + end, glm::vec4(1, 0.5f, 0, 1)); // on release set cue velocity to forcevector
+			float angle = atan2f(forceVector.y, forceVector.x);
+			glm::vec2 end = glm::vec2(std::cos(angle), std::sin(angle)) * forceVectorLength;
 
-		m_cueForce = forceVector * 20.f;
+			aie::Gizmos::add2DLine(cuePos, cuePos + end, glm::vec4(1, 0.5f, 0, 1)); // on release set cue velocity to forcevector
+
+			m_cueForce = forceVector * 20.f;
+		}
 	}
 	if (a_input->wasMouseButtonReleased(0))
 	{
-		m_cueForceVectorStart = glm::vec2(0, 0);
-		m_cue->ApplyForce(m_cueForce, glm::vec2(0, 0));
+		if (m_ballsStatic)
+		{
+			m_cueForceVectorStart = glm::vec2(0, 0);
+			m_cue->ApplyForce(m_cueForce, glm::vec2(0, 0));
+		}
 	}
 }
 

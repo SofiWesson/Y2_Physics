@@ -24,9 +24,9 @@ Circle::~Circle()
 
 }
 
-void Circle::update(float a_dt)
+void Circle::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 {
-
+	RigidBody::FixedUpdate(a_gravity, a_timeStep);
 }
 
 void Circle::MakeGizmo()

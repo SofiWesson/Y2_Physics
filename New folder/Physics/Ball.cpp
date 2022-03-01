@@ -41,13 +41,12 @@ Ball::~Ball()
 
 }
 
-void Ball::update(float a_dt)
+void Ball::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 {
-
+	RigidBody::FixedUpdate(a_gravity, a_timeStep);
 }
 
-void Ball::MakeGizmo()
-{
+void Ball::MakeGizmo(){
 	glm::vec2 end = glm::vec2(std::cos(m_rotation), std::sin(m_rotation)) * m_radius;
 
 	aie::Gizmos::add2DCircle(m_positon, m_radius, 12, m_colour);

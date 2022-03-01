@@ -154,6 +154,6 @@ private:
 	unsigned int 	m_2DtriVBO;
 
 	static Gizmos*	sm_singleton;
-};
+	};
 
 } // namespace aie

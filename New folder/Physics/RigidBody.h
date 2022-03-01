@@ -29,6 +29,7 @@ public:
 	float GetMoment() { return m_isKinematic ? INT_MAX : m_moment; }
 	bool GetIsKinematic() { return m_isKinematic; }
 	float GetKineticEnergy();
+	float GetLinearDrag() { return m_linearDrag; }
 
 	void SetMass(float a_mass) { m_mass = a_mass; }
 	void SetKinematic(bool a_state) { m_isKinematic = a_state; }
@@ -36,6 +37,7 @@ public:
 	void SetMoment(float a_moment) { m_moment += a_moment; }
 	void SetRotation(float a_rot) { m_angularVelocity = a_rot; }
 	void SetVelocity(glm::vec2 a_vel) { m_velocity = a_vel; }
+	void SetLinearDrag(float a_linearDrag) { m_linearDrag = a_linearDrag; }
 
 	void TriggerEnter(PhysicsObject* a_otherObject);
 

@@ -119,10 +119,10 @@
     <ClInclude Include="Spring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ball.h">
+    <ClInclude Include="Softbody.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Softbody.h">
+    <ClInclude Include="Ball.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -42,7 +42,7 @@ void RigidBody::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 {
 	if (m_isTrigger)
 	{
-		/* Check every object that is inside this objectand called triggerEnter on if they haven't
+		/* Check every object that is inside this object and called triggerEnter on if they haven't
 		   registered inside of this frame, they had to of exited therefore we can remove them
 		   from out list and call triggerExit */
 
@@ -117,7 +117,7 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 
 	if (cp_velocityThis >= cp_velocityOther) // They are moving closer
 	{
-		if (!m_isTrigger && !a_otherActor->m_isTrigger)
+		if (!IsTrigger() && !a_otherActor->IsTrigger())
 		{
 			// if (a_otherActor->GetIsKinematic())
 			// 	a_otherActor->SetVelocity(glm::vec2(0, 0));
@@ -132,6 +132,9 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 			float elasticity = 0.f;
 			glm::vec2 impact = glm::vec2(0, 0);
 
+			if (GetIsKinematic() && a_otherActor->GetIsKinematic())
+				return;
+
 			if (!GetIsKinematic() && !a_otherActor->GetIsKinematic())
 			{
 				massThis = 1.f / (1.f / GetMass() + glm::pow(radiusThis, 2.f) / m_moment);
@@ -140,16 +143,44 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 				elasticity = (m_elasticity + a_otherActor->GetElasticity()) / 2.f;
 
 				impact = (1.f + elasticity) * massThis * massOther / (massThis + massOther) * (cp_velocityThis - cp_velocityOther) * normal;
+
+				ApplyForce(-impact, a_contact - m_positon);
+				a_otherActor->ApplyForce(impact, a_contact - a_otherActor->GetPosition());
 			}
 			
-			if (GetIsKinematic())
+			if (GetIsKinematic() && !a_otherActor->GetIsKinematic()) // other actor collide normally
 			{
-				// copy ResolvePlaneCollision eMass, j, and force for this and a_otherActor
+				glm::vec2 localContact = a_contact - a_otherActor->GetPosition();
+				glm::vec2 vRel = a_otherActor->GetVelocity() + a_otherActor->GetAngularVelocity() * glm::vec2(-localContact.y, localContact.x);
+
+				float velIntoThis = glm::dot(vRel, normal);
+				float e = (m_elasticity + a_otherActor->GetElasticity()) / 2;
+				float r = glm::dot(localContact, glm::vec2(normal.y, -normal.x));
+
+				float eMass = 1.f / (1.f / a_otherActor->GetMass() + (r * r) / a_otherActor->GetMoment());
+				float j = -(1 + e) * velIntoThis * eMass;
+
+				glm::vec2 force = normal * j;
+
+				a_otherActor->ApplyForce(force, a_contact - a_otherActor->GetPosition());
 			}
 
+			if (a_otherActor->GetIsKinematic() && !GetIsKinematic()) // this actor collide normally
+			{
+				glm::vec2 localContact = a_contact - GetPosition();
+				glm::vec2 vRel = GetVelocity() + GetAngularVelocity() * glm::vec2(-localContact.y, localContact.x);
 
-			ApplyForce(-impact, a_contact - m_positon);
-			a_otherActor->ApplyForce(impact, a_contact - a_otherActor->GetPosition());
+				float velIntoOther = glm::dot(vRel, normal);
+				float e = (a_otherActor->GetElasticity() + GetElasticity()) / 2;
+				float r = glm::dot(localContact, glm::vec2(normal.y, -normal.x));
+
+				float eMass = 1.f / (1.f / GetMass() + (r * r) / GetMoment());
+				float j = -(1 + e) * velIntoOther * eMass;
+
+				glm::vec2 force = normal * j;
+
+				ApplyForce(force, a_contact - GetPosition());
+			}
 		}
 		else
 		{

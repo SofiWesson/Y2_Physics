@@ -3,6 +3,7 @@
 #include "App.h"
 #include "Renderer2D.h"
 #include <Input.h>
+#include <list>
 
 #include "PhysicsScene.h"
 #include "GameStateManager.h"
@@ -47,6 +48,8 @@ protected:
 	Ball* m_cue;
 	glm::vec2 m_cueForceVectorStart = glm::vec2(0, 0);
 	glm::vec2 m_cueForce = glm::vec2(0, 0);
+	std::list<Ball*> m_balls;
+	bool m_ballsStatic = true;
 
 	const float m_extents = 100;
 	const float m_aspectRatio = 16.f / 9.f;
