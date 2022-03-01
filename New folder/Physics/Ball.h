@@ -11,6 +11,8 @@ public:
 	virtual void FixedUpdate(glm::vec2 a_gravity, float a_timeStep);
 	virtual void MakeGizmo();
 
+	BallType GetBallType() { return m_ballType; }
+
 protected:
 	BallType m_ballType;
 };

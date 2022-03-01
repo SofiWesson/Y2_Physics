@@ -131,6 +131,28 @@ Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 
 	circle->ApplyForce(a_force, glm::vec2(0, 0));
 
+	//if (a_isTrigger)
+	//{
+	//	circle->triggerEnter = [=](PhysicsObject* a_other)
+	//	{
+	//		Ball* ball = dynamic_cast<Ball*>(a_other);
+	//		if (ball != nullptr)
+	//		{
+	//			if (ball->GetBallType() == SOLID || STRIPES)
+	//			{
+	//				m_balls.remove(ball);
+	//				m_physicsScene->RemoveActor(a_other);
+	//			}
+	//			else if (ball->GetBallType() == CUEBALL)
+	//				ball->SetPosition(glm::vec2(-25, 0));
+	//			else if (ball->GetBallType() == EIGHTBALL)
+	//				ball->SetPosition(glm::vec2(0, 0));
+	//		}
+
+	//		//std::cout << trigger->GetPosition().x << " " << trigger->GetPosition().y << " Entered: " << a_other << std::endl;
+	//	};
+	//}
+
 	return circle;
 }
 
@@ -232,56 +254,57 @@ void PhysicsApp::CreateTable()
 
 	float socketDiameter = 5.5f;
 
+	std::list<Circle*> sockets;
 	std::list<Circle*> triggers;
 
-	Box* tableBase = CreateBox(pos, vel, rot, mass, width, height, baseColour, force, true, false, false);
+	Box* tableBase = CreateBox(pos, vel, rot, mass, width + edgeSize, height + edgeSize, baseColour, force, true, false, false);
 
 	// ===================================================================== EDGES ===================================================================== // edges need resize
 	// table north edge // left, right
 	Box* tableNorthLeftEdge = CreateBox(
-		glm::vec2(pos.x - (width / 4),
-				  pos.y + height / 2 + edgeSize / 2),
+		glm::vec2(pos.x - (width / 4) - 0.4f,
+			pos.y + height / 2 + edgeSize / 2),
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter - edgeSize,
+		width / 2 - socketDiameter - edgeSize + 1,
 		edgeSize,
 		edgeColour,
 		force,
 		true, false, true);
-	
+
 	Box* tableNorthRightEdge = CreateBox(
-		glm::vec2(pos.x + (width / 4),
-				  pos.y + height / 2 + edgeSize / 2),
+		glm::vec2(pos.x + (width / 4) + 0.4f,
+			pos.y + height / 2 + edgeSize / 2),
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter - edgeSize,
+		width / 2 - socketDiameter - edgeSize + 1,
 		edgeSize,
 		edgeColour,
 		force,
 		true, false, true);
-	
+
 	// table south edge // left, right
 	Box* tableSouthLeftEdge = CreateBox(
-		glm::vec2(pos.x - (width / 4),
-				  pos.y - height / 2 - edgeSize / 2),
+		glm::vec2(pos.x - (width / 4) - 0.4f,
+			pos.y - height / 2 - edgeSize / 2),
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter - edgeSize,
+		width / 2 - socketDiameter - edgeSize + 1,
 		edgeSize,
 		edgeColour,
 		force,
 		true, false, true);
-	
+
 	Box* tableSouthRightEdge = CreateBox(
-		glm::vec2(pos.x + (width / 4),
-				  pos.y - height / 2 - edgeSize / 2),
+		glm::vec2(pos.x + (width / 4) + 0.4f,
+			pos.y - height / 2 - edgeSize / 2),
 		vel,
 		rot,
 		mass,
-		width / 2 - socketDiameter - edgeSize,
+		width / 2 - socketDiameter - edgeSize + 1,
 		edgeSize,
 		edgeColour,
 		force,
@@ -290,12 +313,12 @@ void PhysicsApp::CreateTable()
 	// table left edge
 	Box* tableWestEdge = CreateBox(
 		glm::vec2(pos.x - width / 2 - edgeSize / 2,
-				  pos.y),
+			pos.y),
 		vel,
 		rot,
 		mass,
 		edgeSize,
-		height - socketDiameter - edgeSize,
+		height - socketDiameter - edgeSize / 1.5f,
 		edgeColour,
 		force,
 		true, false, true);
@@ -303,12 +326,12 @@ void PhysicsApp::CreateTable()
 	// table right edge
 	Box* tableEastEdge = CreateBox(
 		glm::vec2(pos.x + width / 2 + edgeSize / 2,
-				  pos.y),
+			pos.y),
 		vel,
 		rot,
 		mass,
 		edgeSize,
-		height - socketDiameter - edgeSize,
+		height - socketDiameter - edgeSize / 1.5f,
 		edgeColour,
 		force,
 		true, false, true);
@@ -441,7 +464,7 @@ void PhysicsApp::CreateTable()
 	// ===================================================================== SOCKETS =====================================================================
 	Circle* socketNorth = CreateCircle(
 		glm::vec2(pos.x,
-				  pos.y + height / 2 + socketDiameter / 2),
+			pos.y + height / 2 + socketDiameter / 2),
 		vel,
 		mass,
 		socketDiameter / 2,
@@ -449,11 +472,11 @@ void PhysicsApp::CreateTable()
 		force,
 		true, true, true);
 
-	triggers.push_back(socketNorth);
-	
+	sockets.push_back(socketNorth);
+
 	Circle* socketSouth = CreateCircle(
 		glm::vec2(pos.x,
-				  pos.y - height / 2 - socketDiameter / 2),
+			pos.y - height / 2 - socketDiameter / 2),
 		vel,
 		mass,
 		socketDiameter / 2,
@@ -461,11 +484,11 @@ void PhysicsApp::CreateTable()
 		force,
 		true, true, true);
 
-	triggers.push_back(socketSouth);
-	
+	sockets.push_back(socketSouth);
+
 	Circle* socketNW = CreateCircle(
 		glm::vec2(pos.x - width / 2 + edgeSize / 2 - socketDiameter / 2,
-				  pos.y + height / 2 - edgeSize / 2 + socketDiameter / 2),
+			pos.y + height / 2 - edgeSize / 2 + socketDiameter / 2),
 		vel,
 		mass,
 		socketDiameter / 2,
@@ -473,11 +496,11 @@ void PhysicsApp::CreateTable()
 		force,
 		true, true, true);
 
-	triggers.push_back(socketNW);
+	sockets.push_back(socketNW);
 
 	Circle* socketSW = CreateCircle(
 		glm::vec2(pos.x - width / 2 + edgeSize / 2 - socketDiameter / 2,
-				  pos.y - height / 2 + edgeSize / 2 - socketDiameter / 2),
+			pos.y - height / 2 + edgeSize / 2 - socketDiameter / 2),
 		vel,
 		mass,
 		socketDiameter / 2,
@@ -485,11 +508,11 @@ void PhysicsApp::CreateTable()
 		force,
 		true, true, true);
 
-	triggers.push_back(socketSW);
+	sockets.push_back(socketSW);
 
 	Circle* socketNE = CreateCircle(
 		glm::vec2(pos.x + width / 2 - edgeSize / 2 + socketDiameter / 2,
-				  pos.y + height / 2 - edgeSize / 2 + socketDiameter / 2),
+			pos.y + height / 2 - edgeSize / 2 + socketDiameter / 2),
 		vel,
 		mass,
 		socketDiameter / 2,
@@ -497,28 +520,62 @@ void PhysicsApp::CreateTable()
 		force,
 		true, true, true);
 
-	triggers.push_back(socketNE);
+	sockets.push_back(socketNE);
 
 	Circle* socketSE = CreateCircle(
 		glm::vec2(pos.x + width / 2 - edgeSize / 2 + socketDiameter / 2,
-			      pos.y - height / 2 + edgeSize / 2 - socketDiameter / 2),
+			pos.y - height / 2 + edgeSize / 2 - socketDiameter / 2),
 		vel,
 		mass,
 		socketDiameter / 2,
 		glm::vec4(.2f, .2f, .2f, 1),
 		force,
-		true, true, true);
+		true, false, false);
 
-	triggers.push_back(socketSE);
+	sockets.push_back(socketSE);
 
-	// give sockets triggers
-	for (auto trigger : triggers)
+	// smaller trigger for sinking balls
+	for (auto socket : sockets)
 	{
-		trigger->triggerEnter = [=](PhysicsObject* a_other)
+		Circle* hole = CreateCircle(
+			socket->GetPosition(),
+			vel,
+			mass,
+			socketDiameter / 4,
+			glm::vec4(
+				socket->GetColour().x / 2,
+				socket->GetColour().y / 2,
+				socket->GetColour().z / 2,
+				1),
+			force,
+			true, true, true);
+
+		hole->triggerEnter = [=](PhysicsObject* a_other)
 		{
-			std::cout << "socketNorth Entered: " << a_other << std::endl;
+			Ball* ball = dynamic_cast<Ball*>(a_other);
+			if (ball != nullptr)
+			{
+				if (ball->GetBallType() == SOLID || ball->GetBallType() == STRIPES)
+				{
+					m_balls.remove(ball);
+					m_physicsScene->RemoveActor(ball);
+				}
+				else if (ball->GetBallType() == CUEBALL)
+				{
+					ball->SetVelocity(glm::vec2(0, 0));
+					ball->SetPosition(glm::vec2(-25, 0));
+				}
+				else if (ball->GetBallType() == EIGHTBALL)
+				{
+					ball->SetVelocity(glm::vec2(0, 0));
+					ball->SetPosition(glm::vec2(0, 0));
+				}
+			}
+
+			ball = nullptr;
 		};
 	}
+		
 }
 
 void PhysicsApp::RackBalls()

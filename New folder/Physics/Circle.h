@@ -14,6 +14,7 @@ public:
 	glm::vec4 GetColour() { return m_colour; }
 	glm::vec2 GetVelocityLastFrame() { return m_velocityLastFrame; }
 
+	void SetRadius(float a_radius) { m_radius = a_radius; }
 	void SetVelocityLastFrame(glm::vec2 a_currentVelocity) { m_velocityLastFrame = a_currentVelocity; }
 
 	void ResolveCircleCollision(Circle* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal, float a_pen);
