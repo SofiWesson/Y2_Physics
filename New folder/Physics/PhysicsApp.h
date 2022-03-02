@@ -51,6 +51,15 @@ protected:
 	std::list<Ball*> m_balls;
 	bool m_ballsStatic = true;
 
+	BallType m_player1 = NUL;
+	BallType m_player2 = NUL;
+
+	bool ballHasBeenSunk = false;
+	bool isPlayer1Turn = true;
+
+	const char* m_player1Colour = "";
+	const char* m_player2Colour = "";
+
 	const float m_extents = 100;
 	const float m_aspectRatio = 16.f / 9.f;
 

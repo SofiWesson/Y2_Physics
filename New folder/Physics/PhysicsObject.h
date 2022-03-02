@@ -20,7 +20,8 @@ enum BallType
 	SOLID,
 	STRIPES,
 	EIGHTBALL,
-	CUEBALL
+	CUEBALL,
+	NUL
 };
 
 class PhysicsObject

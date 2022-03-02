@@ -103,6 +103,110 @@ void PhysicsApp::update(float deltaTime)
 void PhysicsApp::draw()
 {
 	
+	m_app->Get2DRenderer()->begin();
+
+	const char player1Text[] = "Player 1";
+	const char player2Text[] = "Player 2";
+	const char colourText[] = "Colour";
+	const char noBallsSunk[] = "No Balls Sunk Yet";
+	const char yellow[] = "Yellow";
+	const char red[] = "Red";
+
+	float player1Width = m_app->GetFont()->getStringWidth(player1Text);
+	float player1Height = m_app->GetFont()->getStringHeight(player1Text);
+
+	float player2Width = m_app->GetFont()->getStringWidth(player2Text);
+	float player2Height = m_app->GetFont()->getStringHeight(player2Text);
+
+	float colourTextWidth = m_app->GetFont()->getStringWidth(colourText);
+	float colourTextHeight = m_app->GetFont()->getStringHeight(colourText);
+
+	float noBallsTextWidth = m_app->GetFont()->getStringWidth(noBallsSunk);
+	float noBallsTextHeight = m_app->GetFont()->getStringHeight(noBallsSunk);
+
+	float yellowTextWidth = m_app->GetFont()->getStringWidth(yellow);
+	float yellowTextHeight = m_app->GetFont()->getStringHeight(yellow);
+
+	float redTextWidth = m_app->GetFont()->getStringWidth(red);
+	float redTextHeight = m_app->GetFont()->getStringHeight(red);
+
+	float player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1Colour);
+	float player1ColourTextHeight = m_app->GetFont()->getStringHeight(m_player1Colour);
+
+	float player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2Colour);
+	float player2ColourTextHeight = m_app->GetFont()->getStringHeight(m_player2Colour);
+
+	if (m_player1 == NUL && m_player2 == NUL)
+		m_app->Get2DRenderer()->drawText(
+			m_app->GetFont(),
+			noBallsSunk,
+			(m_app->getWindowWidth() / 2) - (noBallsTextWidth / 2),
+			m_app->getWindowHeight() - noBallsTextHeight - 5);
+
+	if (m_player1 == SOLID)
+	{
+		m_player1Colour = yellow;
+		m_player2Colour = red;
+	}
+	else if (m_player1 == STRIPES)
+	{
+		m_player1Colour = red;
+		m_player2Colour = yellow;
+	}
+
+	float playerTurnRadius = 15.f;
+	float playerTurnPosX = isPlayer1Turn ? player1Width + 20 + playerTurnRadius : m_app->getWindowWidth() - player2Width - 20 - playerTurnRadius;
+	float playerTurnPosY = m_app->getWindowHeight() - (player1Height / 2) - 10;
+	
+
+	m_app->Get2DRenderer()->drawCircle(
+		playerTurnPosX,
+		playerTurnPosY,
+		playerTurnRadius);
+
+	// Player 1
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		player1Text,
+		10,
+		m_app->getWindowHeight() - player1Height - 5);
+
+	// Player 1 colour
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		colourText,
+		10,
+		m_app->getWindowHeight() - colourTextHeight - player1Height - 20);
+
+	// colour
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		m_player1Colour,
+		colourTextWidth + 30,
+		m_app->getWindowHeight() - player1ColourTextHeight - player1Height - 20);
+
+	// Player 2
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		player2Text,
+		m_app->getWindowWidth() - player2Width - 10,
+		m_app->getWindowHeight() - player2Height - 5);
+
+	// Player 2 colour
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		colourText,
+		m_app->getWindowWidth() - colourTextWidth - 10,
+		m_app->getWindowHeight() - colourTextHeight - player2Height - 20);
+
+	// colour
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		m_player2Colour,
+		m_app->getWindowWidth() - colourTextWidth - player2ColourTextWidth - 30,
+		m_app->getWindowHeight() - player2ColourTextHeight - player2Height - 20);
+
+	m_app->Get2DRenderer()->end();
 }
 
 glm::vec2 PhysicsApp::ScreenToWorld(glm::vec2 a_screenPos)
@@ -555,24 +659,43 @@ void PhysicsApp::CreateTable()
 			Ball* ball = dynamic_cast<Ball*>(a_other);
 			if (ball != nullptr)
 			{
-				if (ball->GetBallType() == SOLID || ball->GetBallType() == STRIPES)
+				if (ball->GetBallType() == SOLID)
 				{
-					m_balls.remove(ball);
-					m_physicsScene->RemoveActor(ball);
+					if (!ballHasBeenSunk)
+					{
+						ballHasBeenSunk = true;
+
+						m_player1 = isPlayer1Turn ? SOLID : STRIPES;
+						m_player2 = isPlayer1Turn ? STRIPES : SOLID;
+					}
+					else if (isPlayer1Turn) isPlayer1Turn = m_player1 == SOLID ? true : false;
+					else if (!isPlayer1Turn) isPlayer1Turn = m_player2 == SOLID ? true : false;
+				}
+				else if (ball->GetBallType() == STRIPES)
+				{
+					if (!ballHasBeenSunk)
+					{
+						ballHasBeenSunk = true;
+
+						m_player1 = isPlayer1Turn ? STRIPES : SOLID;
+						m_player2 = isPlayer1Turn ? SOLID : STRIPES;
+					}
+					else if (isPlayer1Turn) isPlayer1Turn = m_player1 == STRIPES ? true : false;
+					else if (!isPlayer1Turn) isPlayer1Turn = m_player2 == STRIPES ? true : false;
 				}
 				else if (ball->GetBallType() == CUEBALL)
 				{
+					isPlayer1Turn = !isPlayer1Turn;
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(-25, 0));
 				}
 				else if (ball->GetBallType() == EIGHTBALL)
 				{
+					isPlayer1Turn = !isPlayer1Turn;
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(0, 0));
 				}
 			}
-
-			ball = nullptr;
 		};
 	}
 		
@@ -681,6 +804,7 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 			glm::vec2 cuePos = m_cue->GetPosition();
 
 			forceVector = glm::vec2(m_cueForceVectorStart - worldPos);
+			
 			float forceVectorLength = glm::length(forceVector);
 			forceVectorLength = glm::clamp(forceVectorLength, 0.f, 20.f);
 
@@ -688,6 +812,11 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 			glm::vec2 end = glm::vec2(std::cos(angle), std::sin(angle)) * forceVectorLength;
 
 			aie::Gizmos::add2DLine(cuePos, cuePos + end, glm::vec4(1, 0.5f, 0, 1)); // on release set cue velocity to forcevector
+
+			float clampForce = 40.f;
+
+			forceVector.x = glm::clamp(forceVector.x, -clampForce, clampForce);
+			forceVector.y = glm::clamp(forceVector.y, -clampForce, clampForce);
 
 			m_cueForce = forceVector * 20.f;
 		}
