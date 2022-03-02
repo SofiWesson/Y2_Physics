@@ -180,8 +180,6 @@ bool PhysicsScene::Plane2Box(PhysicsObject* a_plane, PhysicsObject* a_box)
 		// We have a hit if greater then 0, typically only 1 to 2 corners will collide
 		if (numContacts > 0)
 		{
-			// 
-
 			plane->ResolvePlaneCollision(box, contact / (float)numContacts);
 			return true;
 		}

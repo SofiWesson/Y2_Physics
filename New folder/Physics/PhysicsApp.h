@@ -54,9 +54,14 @@ protected:
 	BallType m_player1 = NUL;
 	BallType m_player2 = NUL;
 
+	std::list<Ball*> m_p1Sunk;
+	std::list<Ball*> m_p2Sunk;
+
 	bool m_firstBallHasBeenSunk = false;
 	bool m_hasBallBeenSunk = false;
 	bool m_isPlayer1Turn = true;
+	bool m_inPlay = false;
+	bool m_inPlayLastFrame = false;
 
 	const char* m_player1Colour = "";
 	const char* m_player2Colour = "";

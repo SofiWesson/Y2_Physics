@@ -88,6 +88,24 @@ void PhysicsApp::shutdown() {
 
 void PhysicsApp::update(float deltaTime) 
 {
+	for (auto ball : m_balls)
+	{
+		if (ball->GetVelocity().x > 0.15f || ball->GetVelocity().x < -0.15f &&
+			ball->GetVelocity().y > 0.15f || ball->GetVelocity().y < -0.15f)
+		{
+			m_ballsStatic = false;
+			break;
+		}
+		if (ball == m_balls.back())
+		{
+			m_ballsStatic = true;
+			m_inPlay = false;
+		}
+	}
+
+	if (!m_inPlay && m_inPlayLastFrame && !m_hasBallBeenSunk)
+		m_isPlayer1Turn = !m_isPlayer1Turn;
+
 	// input example
 	aie::Input* input = aie::Input::getInstance();
 
@@ -97,12 +115,13 @@ void PhysicsApp::update(float deltaTime)
 	m_physicsScene->Draw();
 
 	HitCueBall(input);
+
+	m_inPlayLastFrame = m_inPlay;
 	// MouseInputTest(input);
 }
 
 void PhysicsApp::draw()
 {
-	
 	m_app->Get2DRenderer()->begin();
 
 	const char player1Text[] = "Player 1";
@@ -136,8 +155,6 @@ void PhysicsApp::draw()
 	float player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2Colour);
 	float player2ColourTextHeight = m_app->GetFont()->getStringHeight(m_player2Colour);
 
-	
-
 	if (m_player1 == NUL && m_player2 == NUL)
 		m_app->Get2DRenderer()->drawText(
 			m_app->GetFont(),
@@ -160,6 +177,7 @@ void PhysicsApp::draw()
 	float playerTurnPosX = m_isPlayer1Turn ? player1Width + 20 + playerTurnRadius : m_app->getWindowWidth() - player2Width - 20 - playerTurnRadius;
 	float playerTurnPosY = m_app->getWindowHeight() - (player1Height / 2) - 10;
 	
+	// player turn indicator
 	m_app->Get2DRenderer()->drawCircle(
 		playerTurnPosX,
 		playerTurnPosY,
@@ -669,11 +687,26 @@ void PhysicsApp::CreateTable()
 						m_player1 = m_isPlayer1Turn ? SOLID : STRIPES;
 						m_player2 = m_isPlayer1Turn ? STRIPES : SOLID;
 					}
-					else if (m_isPlayer1Turn) m_isPlayer1Turn = m_player1 == SOLID ? true : false;
-					else if (!m_isPlayer1Turn) m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
+					if (m_isPlayer1Turn)
+					{
+						m_isPlayer1Turn = m_player1 == SOLID ? true : false;
 
-					ball->SetVelocity(glm::vec2(0, 0));
-					ball->SetPosition(glm::vec2(0, 100));
+						ball->SetVelocity(glm::vec2(0, 0));
+						ball->SetPosition(glm::vec2(-70, 40 - (ball->GetRadius() * (m_p1Sunk.size() - 1))));
+
+						m_balls.remove(ball);
+						m_p1Sunk.push_back(ball);
+					}
+					else if (!m_isPlayer1Turn)
+					{
+						m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
+
+						ball->SetVelocity(glm::vec2(0, 0));
+						ball->SetPosition(glm::vec2(70, 40 - (ball->GetRadius() * (m_p2Sunk.size() - 1))));
+
+						m_balls.remove(ball);
+						m_p2Sunk.push_back(ball);
+					}
 
 					m_hasBallBeenSunk = true;
 				}
@@ -686,8 +719,26 @@ void PhysicsApp::CreateTable()
 						m_player1 = m_isPlayer1Turn ? STRIPES : SOLID;
 						m_player2 = m_isPlayer1Turn ? SOLID : STRIPES;
 					}
-					else if (m_isPlayer1Turn) m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
-					else if (!m_isPlayer1Turn) m_isPlayer1Turn = m_player2 == SOLID ? true : false;
+					if (m_isPlayer1Turn)
+					{
+						m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
+
+						ball->SetVelocity(glm::vec2(0, 0));
+						ball->SetPosition(glm::vec2(-70, 40));// +(ball->GetRadius() * (m_p1Sunk.size() - 1))));
+
+						m_balls.remove(ball);
+						m_p1Sunk.push_back(ball);
+					}
+					else if (!m_isPlayer1Turn)
+					{
+						m_isPlayer1Turn = m_player2 == SOLID ? true : false;
+
+						ball->SetVelocity(glm::vec2(0, 0));
+						ball->SetPosition(glm::vec2(70, 40));// +(ball->GetRadius() * (m_p2Sunk.size() - 1))));
+
+						m_balls.remove(ball);
+						m_p2Sunk.push_back(ball);
+					}
 
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(0, 100));
@@ -796,18 +847,6 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 
 	if (a_input->isMouseButtonDown(0))
 	{
-		for (auto ball : m_balls)
-		{
-			if (ball->GetVelocity().x > 0.15f || ball->GetVelocity().x < -0.15f &&
-				ball->GetVelocity().y > 0.15f || ball->GetVelocity().y < -0.15f)
-			{
-				m_ballsStatic = false;
-				break;
-			}
-			if (ball == m_balls.back())
-				m_ballsStatic = true;
-		}
-
 		if (m_ballsStatic)
 		{
 			a_input->getMouseXY(&screenX, &screenY);
@@ -840,6 +879,7 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 	{
 		if (m_ballsStatic)
 		{
+			m_inPlay = true;
 			m_cueForceVectorStart = glm::vec2(0, 0);
 			m_cue->ApplyForce(m_cueForce, glm::vec2(0, 0));
 			m_hasBallBeenSunk = false;
