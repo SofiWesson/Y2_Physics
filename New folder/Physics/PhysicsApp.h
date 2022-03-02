@@ -38,8 +38,8 @@ protected:
 	App* m_app;
 	PhysicsScene* m_physicsScene;
 
-	float timer = 0.f;
-	float timerReset = 0.1f;
+	float m_timer = 0.f;
+	float m_timerReset = 0.1f;
 
 	//Application2D* m_app;
 	Player* m_player;
@@ -54,8 +54,9 @@ protected:
 	BallType m_player1 = NUL;
 	BallType m_player2 = NUL;
 
-	bool ballHasBeenSunk = false;
-	bool isPlayer1Turn = true;
+	bool m_firstBallHasBeenSunk = false;
+	bool m_hasBallBeenSunk = false;
+	bool m_isPlayer1Turn = true;
 
 	const char* m_player1Colour = "";
 	const char* m_player2Colour = "";

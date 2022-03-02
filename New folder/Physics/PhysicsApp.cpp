@@ -136,6 +136,8 @@ void PhysicsApp::draw()
 	float player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2Colour);
 	float player2ColourTextHeight = m_app->GetFont()->getStringHeight(m_player2Colour);
 
+	
+
 	if (m_player1 == NUL && m_player2 == NUL)
 		m_app->Get2DRenderer()->drawText(
 			m_app->GetFont(),
@@ -155,10 +157,9 @@ void PhysicsApp::draw()
 	}
 
 	float playerTurnRadius = 15.f;
-	float playerTurnPosX = isPlayer1Turn ? player1Width + 20 + playerTurnRadius : m_app->getWindowWidth() - player2Width - 20 - playerTurnRadius;
+	float playerTurnPosX = m_isPlayer1Turn ? player1Width + 20 + playerTurnRadius : m_app->getWindowWidth() - player2Width - 20 - playerTurnRadius;
 	float playerTurnPosY = m_app->getWindowHeight() - (player1Height / 2) - 10;
 	
-
 	m_app->Get2DRenderer()->drawCircle(
 		playerTurnPosX,
 		playerTurnPosY,
@@ -661,41 +662,55 @@ void PhysicsApp::CreateTable()
 			{
 				if (ball->GetBallType() == SOLID)
 				{
-					if (!ballHasBeenSunk)
+					if (!m_firstBallHasBeenSunk)
 					{
-						ballHasBeenSunk = true;
+						m_firstBallHasBeenSunk = true;
 
-						m_player1 = isPlayer1Turn ? SOLID : STRIPES;
-						m_player2 = isPlayer1Turn ? STRIPES : SOLID;
+						m_player1 = m_isPlayer1Turn ? SOLID : STRIPES;
+						m_player2 = m_isPlayer1Turn ? STRIPES : SOLID;
 					}
-					else if (isPlayer1Turn) isPlayer1Turn = m_player1 == SOLID ? true : false;
-					else if (!isPlayer1Turn) isPlayer1Turn = m_player2 == SOLID ? true : false;
+					else if (m_isPlayer1Turn) m_isPlayer1Turn = m_player1 == SOLID ? true : false;
+					else if (!m_isPlayer1Turn) m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
+
+					ball->SetVelocity(glm::vec2(0, 0));
+					ball->SetPosition(glm::vec2(0, 100));
+
+					m_hasBallBeenSunk = true;
 				}
 				else if (ball->GetBallType() == STRIPES)
 				{
-					if (!ballHasBeenSunk)
+					if (!m_firstBallHasBeenSunk)
 					{
-						ballHasBeenSunk = true;
+						m_firstBallHasBeenSunk = true;
 
-						m_player1 = isPlayer1Turn ? STRIPES : SOLID;
-						m_player2 = isPlayer1Turn ? SOLID : STRIPES;
+						m_player1 = m_isPlayer1Turn ? STRIPES : SOLID;
+						m_player2 = m_isPlayer1Turn ? SOLID : STRIPES;
 					}
-					else if (isPlayer1Turn) isPlayer1Turn = m_player1 == STRIPES ? true : false;
-					else if (!isPlayer1Turn) isPlayer1Turn = m_player2 == STRIPES ? true : false;
+					else if (m_isPlayer1Turn) m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
+					else if (!m_isPlayer1Turn) m_isPlayer1Turn = m_player2 == SOLID ? true : false;
+
+					ball->SetVelocity(glm::vec2(0, 0));
+					ball->SetPosition(glm::vec2(0, 100));
+
+					m_hasBallBeenSunk = true;
 				}
 				else if (ball->GetBallType() == CUEBALL)
 				{
-					isPlayer1Turn = !isPlayer1Turn;
+					m_isPlayer1Turn = !m_isPlayer1Turn;
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(-25, 0));
 				}
 				else if (ball->GetBallType() == EIGHTBALL)
 				{
-					isPlayer1Turn = !isPlayer1Turn;
+					m_isPlayer1Turn = !m_isPlayer1Turn;
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(0, 0));
 				}
 			}
+		};
+		hole->triggerExit = [=](PhysicsObject* a_other)
+		{
+
 		};
 	}
 		
@@ -827,6 +842,7 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 		{
 			m_cueForceVectorStart = glm::vec2(0, 0);
 			m_cue->ApplyForce(m_cueForce, glm::vec2(0, 0));
+			m_hasBallBeenSunk = false;
 		}
 	}
 }
