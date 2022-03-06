@@ -678,39 +678,50 @@ void PhysicsApp::CreateTable()
 			Ball* ball = dynamic_cast<Ball*>(a_other);
 			if (ball != nullptr)
 			{
-				if (ball->GetBallType() == SOLID)
+				float ballRadius = 2.f;
+
+				if (ball->GetBallType() == SOLID) // SOLID is yellow
 				{
 					if (!m_firstBallHasBeenSunk)
 					{
 						m_firstBallHasBeenSunk = true;
 
+						// sets what colour each player is
 						m_player1 = m_isPlayer1Turn ? SOLID : STRIPES;
 						m_player2 = m_isPlayer1Turn ? STRIPES : SOLID;
 					}
 					if (m_isPlayer1Turn)
 					{
+						// switch players turn
 						m_isPlayer1Turn = m_player1 == SOLID ? true : false;
 
 						ball->SetVelocity(glm::vec2(0, 0));
-						ball->SetPosition(glm::vec2(-70, 40 - (ball->GetRadius() * (m_p1Sunk.size() - 1))));
 
+						float y = 40 - (ballRadius * m_p1Sunk.size());
+						ball->SetPosition(glm::vec2(-70, y));
+
+						// remove from active balls to check
 						m_balls.remove(ball);
 						m_p1Sunk.push_back(ball);
 					}
 					else if (!m_isPlayer1Turn)
 					{
+						// sets what colour each player is
 						m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
 
 						ball->SetVelocity(glm::vec2(0, 0));
-						ball->SetPosition(glm::vec2(70, 40 - (ball->GetRadius() * (m_p2Sunk.size() - 1))));
 
+						float y = 40 - (ballRadius * m_p2Sunk.size());
+						ball->SetPosition(glm::vec2(70, y));
+
+						// remove from active balls to check
 						m_balls.remove(ball);
 						m_p2Sunk.push_back(ball);
 					}
 
 					m_hasBallBeenSunk = true;
 				}
-				else if (ball->GetBallType() == STRIPES)
+				else if (ball->GetBallType() == STRIPES) // same as SOLID above // STRIPES is red
 				{
 					if (!m_firstBallHasBeenSunk)
 					{
@@ -724,7 +735,9 @@ void PhysicsApp::CreateTable()
 						m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
 
 						ball->SetVelocity(glm::vec2(0, 0));
-						ball->SetPosition(glm::vec2(-70, 40));// +(ball->GetRadius() * (m_p1Sunk.size() - 1))));
+
+						float y = 40 - (ballRadius * m_p1Sunk.size());
+						ball->SetPosition(glm::vec2(-70, y));
 
 						m_balls.remove(ball);
 						m_p1Sunk.push_back(ball);
@@ -734,14 +747,13 @@ void PhysicsApp::CreateTable()
 						m_isPlayer1Turn = m_player2 == SOLID ? true : false;
 
 						ball->SetVelocity(glm::vec2(0, 0));
-						ball->SetPosition(glm::vec2(70, 40));// +(ball->GetRadius() * (m_p2Sunk.size() - 1))));
+
+						float y = 40 - (ballRadius * m_p2Sunk.size());
+						ball->SetPosition(glm::vec2(70, y));
 
 						m_balls.remove(ball);
 						m_p2Sunk.push_back(ball);
 					}
-
-					ball->SetVelocity(glm::vec2(0, 0));
-					ball->SetPosition(glm::vec2(0, 100));
 
 					m_hasBallBeenSunk = true;
 				}
@@ -759,6 +771,7 @@ void PhysicsApp::CreateTable()
 				}
 			}
 		};
+
 		hole->triggerExit = [=](PhysicsObject* a_other)
 		{
 
