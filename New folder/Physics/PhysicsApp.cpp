@@ -130,6 +130,8 @@ void PhysicsApp::draw()
 	const char noBallsSunk[] = "No Balls Sunk Yet";
 	const char yellow[] = "Yellow";
 	const char red[] = "Red";
+	const char waitText[] = "Wait";
+	const char goText[] = "Go";
 
 	float player1Width = m_app->GetFont()->getStringWidth(player1Text);
 	float player1Height = m_app->GetFont()->getStringHeight(player1Text);
@@ -155,12 +157,65 @@ void PhysicsApp::draw()
 	float player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2Colour);
 	float player2ColourTextHeight = m_app->GetFont()->getStringHeight(m_player2Colour);
 
+	float waitTextWidth = m_app->GetFont()->getStringWidth(waitText);
+	float waitTextHeight = m_app->GetFont()->getStringHeight(waitText);
+
+	float goTextWidth = m_app->GetFont()->getStringWidth(goText);
+	float goTextHeight = m_app->GetFont()->getStringHeight(goText);
+
+	// if the first ball has been sunk or not
 	if (m_player1 == NUL && m_player2 == NUL)
 		m_app->Get2DRenderer()->drawText(
 			m_app->GetFont(),
 			noBallsSunk,
 			(m_app->getWindowWidth() / 2) - (noBallsTextWidth / 2),
 			m_app->getWindowHeight() - noBallsTextHeight - 5);
+
+	// TODO make black and white balls stop the other functions from changing players
+	// TODO comment code
+
+	// clean up
+	// Tells the players weather the table is in play or not
+	if (m_inPlay)
+	{
+		// Wait text
+		if (!m_firstBallHasBeenSunk)
+		{
+			m_app->Get2DRenderer()->drawText(
+				m_app->GetFont(),
+				waitText,
+				(m_app->getWindowWidth() / 2) - (waitTextWidth / 2),
+				m_app->getWindowHeight() - noBallsTextHeight - waitTextHeight - 20);
+		}
+		else
+		{
+			m_app->Get2DRenderer()->drawText(
+				m_app->GetFont(),
+				waitText,
+				(m_app->getWindowWidth() / 2) - (waitTextWidth / 2),
+				m_app->getWindowHeight() - waitTextHeight - 5);
+		}
+	}
+	else
+	{
+		// Go text
+		if (!m_firstBallHasBeenSunk)
+		{
+			m_app->Get2DRenderer()->drawText(
+				m_app->GetFont(),
+				goText,
+				(m_app->getWindowWidth() / 2) - (goTextWidth / 2),
+				m_app->getWindowHeight() - noBallsTextHeight - goTextHeight - 20);
+		}
+		else
+		{
+			m_app->Get2DRenderer()->drawText(
+				m_app->GetFont(),
+				goText,
+				(m_app->getWindowWidth() / 2) - (goTextWidth / 2),
+				m_app->getWindowHeight() - goTextHeight - 5);
+		}
+	}
 
 	if (m_player1 == SOLID)
 	{
@@ -173,6 +228,7 @@ void PhysicsApp::draw()
 		m_player2Colour = yellow;
 	}
 
+	// displays which players turn it is with a white ball next to them
 	float playerTurnRadius = 15.f;
 	float playerTurnPosX = m_isPlayer1Turn ? player1Width + 20 + playerTurnRadius : m_app->getWindowWidth() - player2Width - 20 - playerTurnRadius;
 	float playerTurnPosY = m_app->getWindowHeight() - (player1Height / 2) - 10;
