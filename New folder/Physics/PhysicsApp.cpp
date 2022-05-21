@@ -55,8 +55,8 @@ bool PhysicsApp::startup(App* a_app)
 	m_physicsScene->SetTimeStep(0.01f);
 
 	CreateTable();
-
 	RackBalls();
+	LoadUI();
 
 	// SoftbodyTest();
 
@@ -124,114 +124,40 @@ void PhysicsApp::draw()
 {
 	m_app->Get2DRenderer()->begin();
 
-	const char player1Text[] = "Player 1";
-	const char player2Text[] = "Player 2";
-	const char colourText[] = "Colour";
-	const char noBallsSunk[] = "No Balls Sunk Yet";
-	const char yellow[] = "Yellow";
-	const char red[] = "Red";
-	const char waitText[] = "Wait";
-	const char goText[] = "Go";
-
-	float player1Width = m_app->GetFont()->getStringWidth(player1Text);
-	float player1Height = m_app->GetFont()->getStringHeight(player1Text);
-
-	float player2Width = m_app->GetFont()->getStringWidth(player2Text);
-	float player2Height = m_app->GetFont()->getStringHeight(player2Text);
-
-	float colourTextWidth = m_app->GetFont()->getStringWidth(colourText);
-	float colourTextHeight = m_app->GetFont()->getStringHeight(colourText);
-
-	float noBallsTextWidth = m_app->GetFont()->getStringWidth(noBallsSunk);
-	float noBallsTextHeight = m_app->GetFont()->getStringHeight(noBallsSunk);
-
-	float yellowTextWidth = m_app->GetFont()->getStringWidth(yellow);
-	float yellowTextHeight = m_app->GetFont()->getStringHeight(yellow);
-
-	float redTextWidth = m_app->GetFont()->getStringWidth(red);
-	float redTextHeight = m_app->GetFont()->getStringHeight(red);
-
-	float player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1Colour);
-	float player1ColourTextHeight = m_app->GetFont()->getStringHeight(m_player1Colour);
-
-	float player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2Colour);
-	float player2ColourTextHeight = m_app->GetFont()->getStringHeight(m_player2Colour);
-
-	float waitTextWidth = m_app->GetFont()->getStringWidth(waitText);
-	float waitTextHeight = m_app->GetFont()->getStringHeight(waitText);
-
-	float goTextWidth = m_app->GetFont()->getStringWidth(goText);
-	float goTextHeight = m_app->GetFont()->getStringHeight(goText);
-
 	// if the first ball has been sunk or not
 	if (m_player1 == NUL && m_player2 == NUL)
 		m_app->Get2DRenderer()->drawText(
 			m_app->GetFont(),
-			noBallsSunk,
-			(m_app->getWindowWidth() / 2) - (noBallsTextWidth / 2),
-			m_app->getWindowHeight() - noBallsTextHeight - 5);
+			m_noBallsSunkText,
+			(m_app->getWindowWidth() / 2) - (m_noBallsTextWidth / 2),
+			m_app->getWindowHeight() - m_textHeight - 5);
 
 	// TODO make black and white balls stop the other functions from changing players
-	// TODO comment code
-
-	// clean up
-	// Tells the players weather the table is in play or not
+	
 	if (m_inPlay)
 	{
-		// Wait text
-		if (!m_firstBallHasBeenSunk)
-		{
-			m_app->Get2DRenderer()->drawText(
-				m_app->GetFont(),
-				waitText,
-				(m_app->getWindowWidth() / 2) - (waitTextWidth / 2),
-				m_app->getWindowHeight() - noBallsTextHeight - waitTextHeight - 20);
-		}
-		else
-		{
-			m_app->Get2DRenderer()->drawText(
-				m_app->GetFont(),
-				waitText,
-				(m_app->getWindowWidth() / 2) - (waitTextWidth / 2),
-				m_app->getWindowHeight() - waitTextHeight - 5);
-		}
+		m_tableActivityText = m_waitText;
+		m_tableActivityTextWidth = m_waitTextWidth / 2;
 	}
 	else
 	{
-		// Go text
-		if (!m_firstBallHasBeenSunk)
-		{
-			m_app->Get2DRenderer()->drawText(
-				m_app->GetFont(),
-				goText,
-				(m_app->getWindowWidth() / 2) - (goTextWidth / 2),
-				m_app->getWindowHeight() - noBallsTextHeight - goTextHeight - 20);
-		}
-		else
-		{
-			m_app->Get2DRenderer()->drawText(
-				m_app->GetFont(),
-				goText,
-				(m_app->getWindowWidth() / 2) - (goTextWidth / 2),
-				m_app->getWindowHeight() - goTextHeight - 5);
-		}
+		m_tableActivityText = m_goText;
+		m_tableActivityTextWidth = m_goTextWidth / 2;
 	}
 
-	if (m_player1 == SOLID)
-	{
-		m_player1Colour = yellow;
-		m_player2Colour = red;
-	}
-	else if (m_player1 == STRIPES)
-	{
-		m_player1Colour = red;
-		m_player2Colour = yellow;
-	}
+	float tableActivityTextPos = m_firstBallHasBeenSunk ? m_textHeight + 5 : (m_textHeight * 2) + 20;
+
+	// Tells the players weather the table is in play or not
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		m_tableActivityText,
+		(m_app->getWindowWidth() / 2) - m_tableActivityTextWidth,
+		m_app->getWindowHeight() - tableActivityTextPos);
 
 	// displays which players turn it is with a white ball next to them
 	float playerTurnRadius = 15.f;
-	float playerTurnPosX = m_isPlayer1Turn ? player1Width + 20 + playerTurnRadius : m_app->getWindowWidth() - player2Width - 20 - playerTurnRadius;
-	float playerTurnPosY = m_app->getWindowHeight() - (player1Height / 2) - 10;
+	float playerTurnPosX = m_isPlayer1Turn ? m_player1TextWidth + 20 + playerTurnRadius : m_app->getWindowWidth() - m_player2TextWidth - 20 - playerTurnRadius;
+	float playerTurnPosY = m_app->getWindowHeight() - (m_textHeight / 2) - 10;
 	
 	// player turn indicator
 	m_app->Get2DRenderer()->drawCircle(
@@ -242,44 +168,44 @@ void PhysicsApp::draw()
 	// Player 1
 	m_app->Get2DRenderer()->drawText(
 		m_app->GetFont(),
-		player1Text,
+		m_player1Text,
 		10,
-		m_app->getWindowHeight() - player1Height - 5);
+		m_app->getWindowHeight() - m_textHeight - 5);
 
 	// Player 1 colour
 	m_app->Get2DRenderer()->drawText(
 		m_app->GetFont(),
-		colourText,
+		m_colourText,
 		10,
-		m_app->getWindowHeight() - colourTextHeight - player1Height - 20);
+		m_app->getWindowHeight() - (m_textHeight * 2) - 20);
 
 	// colour
 	m_app->Get2DRenderer()->drawText(
 		m_app->GetFont(),
-		m_player1Colour,
-		colourTextWidth + 30,
-		m_app->getWindowHeight() - player1ColourTextHeight - player1Height - 20);
+		m_player1ColourText,
+		m_colourTextWidth + 30,
+		m_app->getWindowHeight() - (m_textHeight * 2) - 20);
 
 	// Player 2
 	m_app->Get2DRenderer()->drawText(
 		m_app->GetFont(),
-		player2Text,
-		m_app->getWindowWidth() - player2Width - 10,
-		m_app->getWindowHeight() - player2Height - 5);
+		m_player2Text,
+		m_app->getWindowWidth() - m_player2TextWidth - 10,
+		m_app->getWindowHeight() - m_textHeight - 5);
 
 	// Player 2 colour
 	m_app->Get2DRenderer()->drawText(
 		m_app->GetFont(),
-		colourText,
-		m_app->getWindowWidth() - colourTextWidth - 10,
-		m_app->getWindowHeight() - colourTextHeight - player2Height - 20);
+		m_colourText,
+		m_app->getWindowWidth() - m_colourTextWidth - 10,
+		m_app->getWindowHeight() - (m_textHeight * 2) - 20);
 
 	// colour
 	m_app->Get2DRenderer()->drawText(
 		m_app->GetFont(),
-		m_player2Colour,
-		m_app->getWindowWidth() - colourTextWidth - player2ColourTextWidth - 30,
-		m_app->getWindowHeight() - player2ColourTextHeight - player2Height - 20);
+		m_player2ColourText,
+		m_app->getWindowWidth() - m_colourTextWidth - m_player2ColourTextWidth - 30,
+		m_app->getWindowHeight() - (m_textHeight * 2) - 20);
 
 	m_app->Get2DRenderer()->end();
 }
@@ -745,6 +671,12 @@ void PhysicsApp::CreateTable()
 						// sets what colour each player is
 						m_player1 = m_isPlayer1Turn ? SOLID : STRIPES;
 						m_player2 = m_isPlayer1Turn ? STRIPES : SOLID;
+
+						m_player1ColourText = m_player1 == SOLID ? m_yellowText : m_redText;
+						m_player2ColourText = m_player2 == SOLID ? m_yellowText : m_redText;
+
+						m_player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1ColourText);
+						m_player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2ColourText);
 					}
 					if (m_isPlayer1Turn)
 					{
@@ -762,7 +694,6 @@ void PhysicsApp::CreateTable()
 					}
 					else if (!m_isPlayer1Turn)
 					{
-						// sets what colour each player is
 						m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
 
 						ball->SetVelocity(glm::vec2(0, 0));
@@ -774,8 +705,6 @@ void PhysicsApp::CreateTable()
 						m_balls.remove(ball);
 						m_p2Sunk.push_back(ball);
 					}
-
-					m_hasBallBeenSunk = true;
 				}
 				else if (ball->GetBallType() == STRIPES) // same as SOLID above // STRIPES is red
 				{
@@ -785,6 +714,12 @@ void PhysicsApp::CreateTable()
 
 						m_player1 = m_isPlayer1Turn ? STRIPES : SOLID;
 						m_player2 = m_isPlayer1Turn ? SOLID : STRIPES;
+
+						m_player1ColourText = m_player1 == SOLID ? m_yellowText : m_redText;
+						m_player2ColourText = m_player2 == SOLID ? m_yellowText : m_redText;
+
+						m_player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1ColourText);
+						m_player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2ColourText);
 					}
 					if (m_isPlayer1Turn)
 					{
@@ -810,8 +745,6 @@ void PhysicsApp::CreateTable()
 						m_balls.remove(ball);
 						m_p2Sunk.push_back(ball);
 					}
-
-					m_hasBallBeenSunk = true;
 				}
 				else if (ball->GetBallType() == CUEBALL)
 				{
@@ -825,6 +758,8 @@ void PhysicsApp::CreateTable()
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(0, 0));
 				}
+
+				m_hasBallBeenSunk = true;
 			}
 		};
 
@@ -1011,4 +946,18 @@ void PhysicsApp::ObjectTest()
 	{
 		std::cout << "Exited: " << a_other << std::endl;
 	};
+}
+
+void PhysicsApp::LoadUI()
+{
+	m_textHeight = m_app->GetFont()->getStringHeight(m_player1Text);
+
+	m_player1TextWidth = m_app->GetFont()->getStringWidth(m_player1Text);
+	m_player2TextWidth = m_app->GetFont()->getStringWidth(m_player2Text);
+	m_colourTextWidth = m_app->GetFont()->getStringWidth(m_colourText);
+	m_noBallsTextWidth = m_app->GetFont()->getStringWidth(m_noBallsSunkText);
+	m_yellowTextWidth = m_app->GetFont()->getStringWidth(m_yellowText);
+	m_redTextWidth = m_app->GetFont()->getStringWidth(m_redText);
+	m_waitTextWidth = m_app->GetFont()->getStringWidth(m_waitText);
+	m_goTextWidth = m_app->GetFont()->getStringWidth(m_goText);
 }

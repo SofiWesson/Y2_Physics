@@ -4,6 +4,7 @@
 #include "Renderer2D.h"
 #include <Input.h>
 #include <list>
+#include <iostream>
 
 #include "PhysicsScene.h"
 #include "GameStateManager.h"
@@ -63,11 +64,40 @@ protected:
 	bool m_inPlay = false;
 	bool m_inPlayLastFrame = false;
 
-	const char* m_player1Colour = "";
-	const char* m_player2Colour = "";
-
 	const float m_extents = 100;
 	const float m_aspectRatio = 16.f / 9.f;
+
+	// UI
+	// UI Text
+	const char* m_player1Text = "Player 1";
+	const char* m_player2Text = "Player 2";
+	const char* m_colourText = "Colour";
+	const char* m_noBallsSunkText = "No Balls Sunk Yet";
+	const char* m_yellowText = "Yellow";
+	const char* m_redText = "Red";
+	const char* m_waitText = "Wait";
+	const char* m_goText = "Go";
+
+	const char* m_player1ColourText = "";
+	const char* m_player2ColourText = "";
+	const char* m_tableActivityText = "";
+
+	// UI Size
+	float m_textHeight;
+
+	float m_player1TextWidth;
+	float m_player2TextWidth;
+	float m_colourTextWidth;
+	float m_noBallsTextWidth;
+	float m_yellowTextWidth;
+	float m_redTextWidth;
+	float m_waitTextWidth;
+	float m_goTextWidth;
+
+
+	float m_player1ColourTextWidth = 0.f;
+	float m_player2ColourTextWidth = 0.f;
+	float m_tableActivityTextWidth = 0.f;
 
 //====================
 public:
@@ -85,6 +115,8 @@ public:
 	void SoftbodyTest();
 	void MouseInputTest(aie::Input* a_input);
 	void ObjectTest();
+
+	void LoadUI();
 
 	bool m_keyPressed = false;
 };
