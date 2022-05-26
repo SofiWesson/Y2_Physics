@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Gizmos.h>
 #include <glm/ext.hpp>
+#include <glm/glm.hpp>
 #include <Input.h>
 #include "Texture.h"
 #include "Font.h"
