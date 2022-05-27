@@ -63,7 +63,7 @@ bool PhysicsApp::startup(App* a_app)
 
 	// Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
 
-	//m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0), false, false);
+	// m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0), false, false);
 
 	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0), false, false);
 	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0), false, false);
@@ -686,7 +686,7 @@ void PhysicsApp::CreateTable()
 
 						ball->SetVelocity(glm::vec2(0, 0));
 
-						float y = 40 - (ballRadius * m_p1Sunk.size());
+						float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
 						ball->SetPosition(glm::vec2(-70, y));
 
 						// remove from active balls to check
@@ -699,7 +699,7 @@ void PhysicsApp::CreateTable()
 
 						ball->SetVelocity(glm::vec2(0, 0));
 
-						float y = 40 - (ballRadius * m_p2Sunk.size());
+						float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
 						ball->SetPosition(glm::vec2(70, y));
 
 						// remove from active balls to check
@@ -728,7 +728,7 @@ void PhysicsApp::CreateTable()
 
 						ball->SetVelocity(glm::vec2(0, 0));
 
-						float y = 40 - (ballRadius * m_p1Sunk.size());
+						float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
 						ball->SetPosition(glm::vec2(-70, y));
 
 						m_balls.remove(ball);
@@ -740,7 +740,7 @@ void PhysicsApp::CreateTable()
 
 						ball->SetVelocity(glm::vec2(0, 0));
 
-						float y = 40 - (ballRadius * m_p2Sunk.size());
+						float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
 						ball->SetPosition(glm::vec2(70, y));
 
 						m_balls.remove(ball);

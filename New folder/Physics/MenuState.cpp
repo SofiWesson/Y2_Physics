@@ -46,5 +46,7 @@ void MenuState::draw()
 
 	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Menu", 10, 30);
 
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Press 1 to play", 10, m_app->getWindowHeight() - 30);
+
 	m_app->Get2DRenderer()->end();
 }
