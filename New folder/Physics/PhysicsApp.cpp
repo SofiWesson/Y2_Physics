@@ -105,7 +105,7 @@ void PhysicsApp::update(float deltaTime)
 	{
 		for each (Ball * ball in m_balls)
 		{
-			if (ball->GetBallType() == STRIPES)
+			if (ball->GetBallType() == SOLID)
 			{
 				ball->SetPosition(glm::vec2(0, -30));
 
@@ -246,28 +246,6 @@ Circle* PhysicsApp::CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass,
 
 	circle->ApplyForce(a_force, glm::vec2(0, 0));
 
-	//if (a_isTrigger)
-	//{
-	//	circle->triggerEnter = [=](PhysicsObject* a_other)
-	//	{
-	//		Ball* ball = dynamic_cast<Ball*>(a_other);
-	//		if (ball != nullptr)
-	//		{
-	//			if (ball->GetBallType() == SOLID || STRIPES)
-	//			{
-	//				m_balls.remove(ball);
-	//				m_physicsScene->RemoveActor(a_other);
-	//			}
-	//			else if (ball->GetBallType() == CUEBALL)
-	//				ball->SetPosition(glm::vec2(-25, 0));
-	//			else if (ball->GetBallType() == EIGHTBALL)
-	//				ball->SetPosition(glm::vec2(0, 0));
-	//		}
-
-	//		//std::cout << trigger->GetPosition().x << " " << trigger->GetPosition().y << " Entered: " << a_other << std::endl;
-	//	};
-	//}
-
 	return circle;
 }
 
@@ -345,11 +323,6 @@ void PhysicsApp::CreateSpring(int a_amount)
 
 		prev = circle;
 	}
-
-	// Add a kinematic box
-	// Box* box = new Box(glm::vec2(0, -20), glm::vec2(0, 0), .3f, 20, glm::vec2(8, 2), glm::vec4(0, 1, 1, 1));
-	// box->SetKinematic(true);
-	// m_physicsScene->AddActor(box);
 }
 
 void PhysicsApp::CreateTable()
@@ -775,7 +748,55 @@ void PhysicsApp::CreateTable()
 							containsSolids = true;
 					}
 
+					bool hasFoundGameOver = false;
+
 					if (containsStripes)
+					{
+						if (!m_firstBallHasBeenSunk)
+						{
+							if (m_isPlayer1Turn)
+							{
+								m_gameOverState->SetPlayWon("Player 2");
+								hasFoundGameOver = true;
+							}
+							else
+							{
+								m_gameOverState->SetPlayWon("Player 1");
+								hasFoundGameOver = true;
+							}
+
+							m_app->GetGSM()->PushState("GameOver");
+						}
+						else if (m_isPlayer1Turn)
+						{
+							m_gameOverState->SetPlayWon("Player 2");
+							m_app->GetGSM()->PushState("GameOver");
+							hasFoundGameOver = true;
+						}
+						else if (!m_isPlayer1Turn)
+						{
+							m_gameOverState->SetPlayWon("Player 1");
+							m_app->GetGSM()->PushState("GameOver");
+							hasFoundGameOver = true;
+						}
+					}
+					else if (!containsStripes)
+					{
+						if (m_isPlayer1Turn && m_player1 == STRIPES)
+						{
+							m_gameOverState->SetPlayWon("Player 1");
+							m_app->GetGSM()->PushState("GameOver");
+							hasFoundGameOver = true;
+						}
+						else if (!m_isPlayer1Turn && m_player2 == STRIPES)
+						{
+							m_gameOverState->SetPlayWon("Player 2");
+							m_app->GetGSM()->PushState("GameOver");
+							hasFoundGameOver = true;
+						}
+					}
+
+					if (containsSolids && !hasFoundGameOver)
 					{
 						if (!m_firstBallHasBeenSunk)
 						{
@@ -787,32 +808,6 @@ void PhysicsApp::CreateTable()
 							m_app->GetGSM()->PushState("GameOver");
 						}
 						else if (m_isPlayer1Turn)
-						{
-							m_gameOverState->SetPlayWon("Player 2");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-						else
-						{
-							m_gameOverState->SetPlayWon("Player 1");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-					}
-					else if (!containsStripes)
-					{
-						if (m_isPlayer1Turn && m_player1 == STRIPES)
-						{
-							m_gameOverState->SetPlayWon("Player 1");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-						else if (!m_isPlayer1Turn && m_player2 == STRIPES) // != STRIPES
-						{
-							m_gameOverState->SetPlayWon("Player 2");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-					}
-					else if (containsSolids)
-					{
-						if (m_isPlayer1Turn)
 						{
 							m_gameOverState->SetPlayWon("Player 2");
 							m_app->GetGSM()->PushState("GameOver");
