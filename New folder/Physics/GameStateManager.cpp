@@ -90,3 +90,8 @@ void GameStateManager::PopState()
 			m_stack.pop_back();
 		});
 }
+
+GameState* GameStateManager::GetGameState(const char* a_state)
+{
+	return m_states[a_state];
+}

@@ -15,6 +15,7 @@ class Plane;
 class Player;
 class Box;
 class Ball;
+class GameOverState;
 
 class PhysicsApp
 {
@@ -38,6 +39,7 @@ protected:
 
 	App* m_app;
 	PhysicsScene* m_physicsScene;
+	GameOverState* m_gameOverState;
 
 	float m_timer = 0.f;
 	float m_timerReset = 0.1f;
@@ -107,7 +109,7 @@ public:
 	Box* CreateBox(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour, glm::vec2 a_force, bool a_isKinematic, bool a_isTrigger, bool a_canCollide);
 	Player* CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour);
 	Player* CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour);
-	void CreateSpring(int a_amount); // make proper constructor later
+	void CreateSpring(int a_amount);
 	void CreateTable();
 	//void CreateEdges();
 	void RackBalls();

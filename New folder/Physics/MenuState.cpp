@@ -35,6 +35,11 @@ void MenuState::update(float dt)
 		m_app->GetGSM()->PopState();
 		m_app->GetGSM()->PushState("Play");
 	}
+	else if (input->wasKeyPressed(aie::INPUT_KEY_2))
+	{
+		m_app->GetGSM()->PopState();
+		m_app->GetGSM()->PushState("Controls");
+	}
 }
 
 void MenuState::draw()
@@ -46,7 +51,8 @@ void MenuState::draw()
 
 	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Menu", 10, 30);
 
-	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Press 1 to play", 10, m_app->getWindowHeight() - 30);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Press 1 to Play", 10, m_app->getWindowHeight() - 30);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Press 2 for Controls", 10, m_app->getWindowHeight() - 70);
 
 	m_app->Get2DRenderer()->end();
 }

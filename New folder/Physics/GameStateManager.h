@@ -8,8 +8,6 @@
 #include <list>
 #include <functional>
 
-class GameState;
-
 class GameStateManager : public aie::Application
 {
 public:
@@ -25,6 +23,8 @@ public:
 	void SetState(const char* a_name, GameState* a_gameState);
 	void PushState(const char* a_name);
 	void PopState();
+
+	GameState* GetGameState(const char* a_state);
 
 protected:
 	std::map<const char*, GameState*> m_states;

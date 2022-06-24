@@ -18,6 +18,7 @@
 #include "Spring.h"
 #include "Softbody.h"
 #include "Ball.h"
+#include "GameOverState.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -36,47 +37,20 @@ bool PhysicsApp::startup(App* a_app)
 {
 	m_app = a_app;
 
-	// Increase the 2d line count to maximise the number of objects we can draw
+	GameState* gs = m_app->GetGSM()->GetGameState("GameOver");
+	m_gameOverState = (GameOverState*)gs;
 
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
-	
 	m_2dRenderer = new aie::Renderer2D();
-
-	// TODO: remember to change this when redistributing a build!
-	// the following path would be used instead: "./font/consolas.ttf"
-	m_font = new aie::Font("../bin/font/consolas.ttf", 32);
+	m_font = new aie::Font("./font/consolas.ttf", 32);
 
 	m_physicsScene = new PhysicsScene();
-
-	/* The lower the value the more accurate the simulation will be. 
-	   but it will increase the processing time required. If it is too high
-	   it will cause the sim to stutter and reduce the stability */
-
 	m_physicsScene->SetGravity(glm::vec2(0, 0));
 	m_physicsScene->SetTimeStep(0.01f);
 
 	CreateTable();
 	RackBalls();
 	LoadUI();
-
-	// SoftbodyTest();
-
-	// Plane* plane = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(0, 1, 0, 1));
-
-	// m_ball = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.5, 0.5, 0.5, 0.5), glm::vec2(0, 0), false, false);
-
-	// Box* box1 = CreateBox(glm::vec2(20, 10), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(0, 0, 1, 1), glm::vec2(-20, 0), false, false);
-	// Box* box2 = CreateBox(glm::vec2(0, 0), glm::vec2(0, 0), 0, 4.f, 4.f, 12.f, glm::vec4(1, 0, 1, 1), glm::vec2(20, 0), false, false);
-	
-	// Circle* ball1 = CreateCircle(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 0.54f, 1), glm::vec2(0, 0), true, false, true);
-	// Circle* ball2 = CreateCircle(glm::vec2(0, 0),  glm::vec2(0, 0), 4.f, 4.f, glm::vec4(0, 1, 0, 1), glm::vec2(0, 0), false, false, true);
-
-	// m_player = CreatePlayer(glm::vec2(30, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(.5f, .5f, .5f, 1.f)); // cirlce
-	// m_player = CreatePlayer(glm::vec2(-10, 0), glm::vec2(0, 0), 0, 4, 4, 8, glm::vec4(0, 0, 1, 1)); // box
-
-	// CreateSpring(10);
-
-	// ObjectTest(); 
 
 	return true;
 }
@@ -89,6 +63,7 @@ void PhysicsApp::shutdown() {
 
 void PhysicsApp::update(float deltaTime) 
 {
+	// check if balls are moving
 	for (auto ball : m_balls)
 	{
 		if (ball->GetVelocity().x > 0.15f || ball->GetVelocity().x < -0.15f &&
@@ -104,11 +79,46 @@ void PhysicsApp::update(float deltaTime)
 		}
 	}
 
+	// change players turn if no balls sunk
 	if (!m_inPlay && m_inPlayLastFrame && !m_hasBallBeenSunk)
 		m_isPlayer1Turn = !m_isPlayer1Turn;
 
-	// input example
+	// get input instance
 	aie::Input* input = aie::Input::getInstance();
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_1))
+	{
+		for each (Ball * ball in m_balls)
+		{
+			if (ball->GetBallType() == EIGHTBALL)
+			{
+				ball->SetPosition(glm::vec2(0, -20));
+			}
+			if (ball->GetBallType() == CUEBALL)
+			{
+				ball->SetPosition(glm::vec2(0, 0));
+			}
+		}
+	}
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_2))
+	{
+		for each (Ball * ball in m_balls)
+		{
+			if (ball->GetBallType() == STRIPES)
+			{
+				ball->SetPosition(glm::vec2(0, -30));
+
+			}
+		}
+	}
+
+	// go back to menu
+	if (input->wasKeyPressed(aie::INPUT_KEY_BACKSPACE))
+	{
+		m_app->GetGSM()->PopState();
+		m_app->GetGSM()->PushState("Menu");
+	}
 
 	aie::Gizmos::clear();
 	
@@ -118,7 +128,6 @@ void PhysicsApp::update(float deltaTime)
 	HitCueBall(input);
 
 	m_inPlayLastFrame = m_inPlay;
-	// MouseInputTest(input);
 }
 
 void PhysicsApp::draw()
@@ -755,7 +764,79 @@ void PhysicsApp::CreateTable()
 				}
 				else if (ball->GetBallType() == EIGHTBALL)
 				{
-					m_isPlayer1Turn = !m_isPlayer1Turn;
+					bool containsStripes = false;
+					bool containsSolids = false;
+
+					for each (Ball* ball in m_balls)
+					{
+						if (ball->GetBallType() == STRIPES)
+							containsStripes = true;
+						else if (ball->GetBallType() == SOLID)
+							containsSolids = true;
+					}
+
+					if (containsStripes)
+					{
+						if (!m_firstBallHasBeenSunk)
+						{
+							if (m_isPlayer1Turn)
+								m_gameOverState->SetPlayWon("Player 2");
+							else
+								m_gameOverState->SetPlayWon("Player 1");
+
+							m_app->GetGSM()->PushState("GameOver");
+						}
+						else if (m_isPlayer1Turn)
+						{
+							m_gameOverState->SetPlayWon("Player 2");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+						else
+						{
+							m_gameOverState->SetPlayWon("Player 1");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+					}
+					else if (!containsStripes)
+					{
+						if (m_isPlayer1Turn && m_player1 == STRIPES)
+						{
+							m_gameOverState->SetPlayWon("Player 1");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+						else if (!m_isPlayer1Turn && m_player2 == STRIPES) // != STRIPES
+						{
+							m_gameOverState->SetPlayWon("Player 2");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+					}
+					else if (containsSolids)
+					{
+						if (m_isPlayer1Turn)
+						{
+							m_gameOverState->SetPlayWon("Player 2");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+						else
+						{
+							m_gameOverState->SetPlayWon("Player 1");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+					}
+					else
+					{
+						if (m_isPlayer1Turn && m_player1 == SOLID)
+						{
+							m_gameOverState->SetPlayWon("Player 1");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+						else if (!m_isPlayer1Turn && m_player2 == SOLID)
+						{
+							m_gameOverState->SetPlayWon("Player 2");
+							m_app->GetGSM()->PushState("GameOver");
+						}
+					}
+
 					ball->SetVelocity(glm::vec2(0, 0));
 					ball->SetPosition(glm::vec2(0, 0));
 				}
@@ -908,7 +989,7 @@ void PhysicsApp::SoftbodyTest()
 	Softbody::Build(m_physicsScene, glm::vec2(-80, 0), 5, 2000, 1, sb);
 }
 
-void PhysicsApp::MouseInputTest(aie::Input* a_input)
+void PhysicsApp::MouseInputTest(aie::Input* a_input) // not used
 {
 	int screenX, screenY;
 
@@ -927,7 +1008,7 @@ void PhysicsApp::MouseInputTest(aie::Input* a_input)
 	}
 }
 
-void PhysicsApp::ObjectTest()
+void PhysicsApp::ObjectTest() // not used
 {
 	Circle* ball1 = CreateCircle(glm::vec2(10, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.f, 1.f, 0.f, 1.f), glm::vec2(0, 0), false, false, true);
 	Circle* ball2 = CreateCircle(glm::vec2(10, -20), glm::vec2(0, 0), 4, 4, glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0, 0), false, false, true);
