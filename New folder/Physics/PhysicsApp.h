@@ -69,7 +69,7 @@ protected:
 	const float m_extents = 100;
 	const float m_aspectRatio = 16.f / 9.f;
 
-	// UI
+	// ============================================================ UI ============================================================
 	// UI Text
 	const char* m_player1Text = "Player 1";
 	const char* m_player2Text = "Player 2";
@@ -96,10 +96,10 @@ protected:
 	float m_waitTextWidth;
 	float m_goTextWidth;
 
-
 	float m_player1ColourTextWidth = 0.f;
 	float m_player2ColourTextWidth = 0.f;
 	float m_tableActivityTextWidth = 0.f;
+	// ============================================================ UI ============================================================
 
 //====================
 public:
@@ -111,7 +111,6 @@ public:
 	Player* CreatePlayer(glm::vec2 a_pos, glm::vec2 a_vel, float a_rot, float a_mass, float a_width, float a_height, glm::vec4 a_colour);
 	void CreateSpring(int a_amount);
 	void CreateTable();
-	//void CreateEdges();
 	void RackBalls();
 	void HitCueBall(aie::Input* a_input);
 	void SoftbodyTest();
@@ -119,6 +118,8 @@ public:
 	void ObjectTest();
 
 	void LoadUI();
+	void EightBallWinConditions();
+	void BallSunk(Ball* a_ball);
 
 	bool m_keyPressed = false;
 };

@@ -642,202 +642,7 @@ void PhysicsApp::CreateTable()
 		{
 			Ball* ball = dynamic_cast<Ball*>(a_other);
 			if (ball != nullptr)
-			{
-				float ballRadius = 2.f;
-
-				if (ball->GetBallType() == SOLID) // SOLID is yellow
-				{
-					if (!m_firstBallHasBeenSunk)
-					{
-						m_firstBallHasBeenSunk = true;
-
-						// sets what colour each player is
-						m_player1 = m_isPlayer1Turn ? SOLID : STRIPES;
-						m_player2 = m_isPlayer1Turn ? STRIPES : SOLID;
-
-						m_player1ColourText = m_player1 == SOLID ? m_yellowText : m_redText;
-						m_player2ColourText = m_player2 == SOLID ? m_yellowText : m_redText;
-
-						m_player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1ColourText);
-						m_player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2ColourText);
-					}
-					if (m_isPlayer1Turn)
-					{
-						// switch players turn
-						m_isPlayer1Turn = m_player1 == SOLID ? true : false;
-
-						ball->SetVelocity(glm::vec2(0, 0));
-
-						float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
-						ball->SetPosition(glm::vec2(-70, y));
-
-						// remove from active balls to check
-						m_balls.remove(ball);
-						m_p1Sunk.push_back(ball);
-					}
-					else if (!m_isPlayer1Turn)
-					{
-						m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
-
-						ball->SetVelocity(glm::vec2(0, 0));
-
-						float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
-						ball->SetPosition(glm::vec2(70, y));
-
-						// remove from active balls to check
-						m_balls.remove(ball);
-						m_p2Sunk.push_back(ball);
-					}
-				}
-				else if (ball->GetBallType() == STRIPES) // same as SOLID above // STRIPES is red
-				{
-					if (!m_firstBallHasBeenSunk)
-					{
-						m_firstBallHasBeenSunk = true;
-
-						m_player1 = m_isPlayer1Turn ? STRIPES : SOLID;
-						m_player2 = m_isPlayer1Turn ? SOLID : STRIPES;
-
-						m_player1ColourText = m_player1 == SOLID ? m_yellowText : m_redText;
-						m_player2ColourText = m_player2 == SOLID ? m_yellowText : m_redText;
-
-						m_player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1ColourText);
-						m_player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2ColourText);
-					}
-					if (m_isPlayer1Turn)
-					{
-						m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
-
-						ball->SetVelocity(glm::vec2(0, 0));
-
-						float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
-						ball->SetPosition(glm::vec2(-70, y));
-
-						m_balls.remove(ball);
-						m_p1Sunk.push_back(ball);
-					}
-					else if (!m_isPlayer1Turn)
-					{
-						m_isPlayer1Turn = m_player2 == SOLID ? true : false;
-
-						ball->SetVelocity(glm::vec2(0, 0));
-
-						float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
-						ball->SetPosition(glm::vec2(70, y));
-
-						m_balls.remove(ball);
-						m_p2Sunk.push_back(ball);
-					}
-				}
-				else if (ball->GetBallType() == CUEBALL)
-				{
-					m_isPlayer1Turn = !m_isPlayer1Turn;
-					ball->SetVelocity(glm::vec2(0, 0));
-					ball->SetPosition(glm::vec2(-25, 0));
-				}
-				else if (ball->GetBallType() == EIGHTBALL)
-				{
-					bool containsStripes = false;
-					bool containsSolids = false;
-
-					for each (Ball* ball in m_balls)
-					{
-						if (ball->GetBallType() == STRIPES)
-							containsStripes = true;
-						else if (ball->GetBallType() == SOLID)
-							containsSolids = true;
-					}
-
-					bool hasFoundGameOver = false;
-
-					if (containsStripes)
-					{
-						if (!m_firstBallHasBeenSunk)
-						{
-							if (m_isPlayer1Turn)
-							{
-								m_gameOverState->SetPlayWon("Player 2");
-								hasFoundGameOver = true;
-							}
-							else
-							{
-								m_gameOverState->SetPlayWon("Player 1");
-								hasFoundGameOver = true;
-							}
-
-							m_app->GetGSM()->PushState("GameOver");
-						}
-						else if (m_isPlayer1Turn)
-						{
-							m_gameOverState->SetPlayWon("Player 2");
-							m_app->GetGSM()->PushState("GameOver");
-							hasFoundGameOver = true;
-						}
-						else if (!m_isPlayer1Turn)
-						{
-							m_gameOverState->SetPlayWon("Player 1");
-							m_app->GetGSM()->PushState("GameOver");
-							hasFoundGameOver = true;
-						}
-					}
-					else if (!containsStripes)
-					{
-						if (m_isPlayer1Turn && m_player1 == STRIPES)
-						{
-							m_gameOverState->SetPlayWon("Player 1");
-							m_app->GetGSM()->PushState("GameOver");
-							hasFoundGameOver = true;
-						}
-						else if (!m_isPlayer1Turn && m_player2 == STRIPES)
-						{
-							m_gameOverState->SetPlayWon("Player 2");
-							m_app->GetGSM()->PushState("GameOver");
-							hasFoundGameOver = true;
-						}
-					}
-
-					if (containsSolids && !hasFoundGameOver)
-					{
-						if (!m_firstBallHasBeenSunk)
-						{
-							if (m_isPlayer1Turn)
-								m_gameOverState->SetPlayWon("Player 2");
-							else
-								m_gameOverState->SetPlayWon("Player 1");
-
-							m_app->GetGSM()->PushState("GameOver");
-						}
-						else if (m_isPlayer1Turn)
-						{
-							m_gameOverState->SetPlayWon("Player 2");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-						else
-						{
-							m_gameOverState->SetPlayWon("Player 1");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-					}
-					else
-					{
-						if (m_isPlayer1Turn && m_player1 == SOLID)
-						{
-							m_gameOverState->SetPlayWon("Player 1");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-						else if (!m_isPlayer1Turn && m_player2 == SOLID)
-						{
-							m_gameOverState->SetPlayWon("Player 2");
-							m_app->GetGSM()->PushState("GameOver");
-						}
-					}
-
-					ball->SetVelocity(glm::vec2(0, 0));
-					ball->SetPosition(glm::vec2(0, 0));
-				}
-
-				m_hasBallBeenSunk = true;
-			}
+				BallSunk(ball);
 		};
 
 		hole->triggerExit = [=](PhysicsObject* a_other)
@@ -1037,4 +842,207 @@ void PhysicsApp::LoadUI()
 	m_redTextWidth = m_app->GetFont()->getStringWidth(m_redText);
 	m_waitTextWidth = m_app->GetFont()->getStringWidth(m_waitText);
 	m_goTextWidth = m_app->GetFont()->getStringWidth(m_goText);
+}
+
+void PhysicsApp::EightBallWinConditions()
+{
+	bool containsStripes = false;
+	bool containsSolids = false;
+
+	for each (Ball * ball in m_balls)
+	{
+		if (ball->GetBallType() == STRIPES)
+			containsStripes = true;
+		else if (ball->GetBallType() == SOLID)
+			containsSolids = true;
+	}
+
+	bool hasFoundGameOver = false;
+
+	if (containsStripes)
+	{
+		if (!m_firstBallHasBeenSunk)
+		{
+			if (m_isPlayer1Turn)
+			{
+				m_gameOverState->SetPlayWon("Player 2");
+				hasFoundGameOver = true;
+			}
+			else
+			{
+				m_gameOverState->SetPlayWon("Player 1");
+				hasFoundGameOver = true;
+			}
+
+			m_app->GetGSM()->PushState("GameOver");
+		}
+		else if (m_isPlayer1Turn)
+		{
+			m_gameOverState->SetPlayWon("Player 2");
+			m_app->GetGSM()->PushState("GameOver");
+			hasFoundGameOver = true;
+		}
+		else if (!m_isPlayer1Turn)
+		{
+			m_gameOverState->SetPlayWon("Player 1");
+			m_app->GetGSM()->PushState("GameOver");
+			hasFoundGameOver = true;
+		}
+	}
+	else if (!containsStripes)
+	{
+		if (m_isPlayer1Turn && m_player1 == STRIPES)
+		{
+			m_gameOverState->SetPlayWon("Player 1");
+			m_app->GetGSM()->PushState("GameOver");
+			hasFoundGameOver = true;
+		}
+		else if (!m_isPlayer1Turn && m_player2 == STRIPES)
+		{
+			m_gameOverState->SetPlayWon("Player 2");
+			m_app->GetGSM()->PushState("GameOver");
+			hasFoundGameOver = true;
+		}
+	}
+
+	if (containsSolids && !hasFoundGameOver)
+	{
+		if (!m_firstBallHasBeenSunk)
+		{
+			if (m_isPlayer1Turn)
+				m_gameOverState->SetPlayWon("Player 2");
+			else
+				m_gameOverState->SetPlayWon("Player 1");
+
+			m_app->GetGSM()->PushState("GameOver");
+		}
+		else if (m_isPlayer1Turn)
+		{
+			m_gameOverState->SetPlayWon("Player 2");
+			m_app->GetGSM()->PushState("GameOver");
+		}
+		else
+		{
+			m_gameOverState->SetPlayWon("Player 1");
+			m_app->GetGSM()->PushState("GameOver");
+		}
+	}
+	else
+	{
+		if (m_isPlayer1Turn && m_player1 == SOLID)
+		{
+			m_gameOverState->SetPlayWon("Player 1");
+			m_app->GetGSM()->PushState("GameOver");
+		}
+		else if (!m_isPlayer1Turn && m_player2 == SOLID)
+		{
+			m_gameOverState->SetPlayWon("Player 2");
+			m_app->GetGSM()->PushState("GameOver");
+		}
+	}
+}
+
+void PhysicsApp::BallSunk(Ball* a_ball)
+{
+	float ballRadius = 2.f;
+
+	if (a_ball->GetBallType() == SOLID) // SOLID is yellow
+	{
+		if (!m_firstBallHasBeenSunk)
+		{
+			m_firstBallHasBeenSunk = true;
+
+			// sets what colour each player is
+			m_player1 = m_isPlayer1Turn ? SOLID : STRIPES;
+			m_player2 = m_isPlayer1Turn ? STRIPES : SOLID;
+
+			m_player1ColourText = m_player1 == SOLID ? m_yellowText : m_redText;
+			m_player2ColourText = m_player2 == SOLID ? m_yellowText : m_redText;
+
+			m_player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1ColourText);
+			m_player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2ColourText);
+		}
+		if (m_isPlayer1Turn)
+		{
+			// switch players turn
+			m_isPlayer1Turn = m_player1 == SOLID ? true : false;
+
+			a_ball->SetVelocity(glm::vec2(0, 0));
+
+			float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
+			a_ball->SetPosition(glm::vec2(-70, y));
+
+			// remove from active balls to check
+			m_balls.remove(a_ball);
+			m_p1Sunk.push_back(a_ball);
+		}
+		else if (!m_isPlayer1Turn)
+		{
+			m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
+
+			a_ball->SetVelocity(glm::vec2(0, 0));
+
+			float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
+			a_ball->SetPosition(glm::vec2(70, y));
+
+			// remove from active balls to check
+			m_balls.remove(a_ball);
+			m_p2Sunk.push_back(a_ball);
+		}
+	}
+	else if (a_ball->GetBallType() == STRIPES) // same as SOLID above // STRIPES is red
+	{
+		if (!m_firstBallHasBeenSunk)
+		{
+			m_firstBallHasBeenSunk = true;
+
+			m_player1 = m_isPlayer1Turn ? STRIPES : SOLID;
+			m_player2 = m_isPlayer1Turn ? SOLID : STRIPES;
+
+			m_player1ColourText = m_player1 == SOLID ? m_yellowText : m_redText;
+			m_player2ColourText = m_player2 == SOLID ? m_yellowText : m_redText;
+
+			m_player1ColourTextWidth = m_app->GetFont()->getStringWidth(m_player1ColourText);
+			m_player2ColourTextWidth = m_app->GetFont()->getStringWidth(m_player2ColourText);
+		}
+		if (m_isPlayer1Turn)
+		{
+			m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
+
+			a_ball->SetVelocity(glm::vec2(0, 0));
+
+			float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
+			a_ball->SetPosition(glm::vec2(-70, y));
+
+			m_balls.remove(a_ball);
+			m_p1Sunk.push_back(a_ball);
+		}
+		else if (!m_isPlayer1Turn)
+		{
+			m_isPlayer1Turn = m_player2 == SOLID ? true : false;
+
+			a_ball->SetVelocity(glm::vec2(0, 0));
+
+			float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
+			a_ball->SetPosition(glm::vec2(70, y));
+
+			m_balls.remove(a_ball);
+			m_p2Sunk.push_back(a_ball);
+		}
+	}
+	else if (a_ball->GetBallType() == CUEBALL)
+	{
+		m_isPlayer1Turn = !m_isPlayer1Turn;
+		a_ball->SetVelocity(glm::vec2(0, 0));
+		a_ball->SetPosition(glm::vec2(-25, 0));
+	}
+	else if (a_ball->GetBallType() == EIGHTBALL)
+	{
+		EightBallWinConditions();
+
+		a_ball->SetVelocity(glm::vec2(0, 0));
+		a_ball->SetPosition(glm::vec2(0, 0));
+	}
+
+	m_hasBallBeenSunk = true;
 }
