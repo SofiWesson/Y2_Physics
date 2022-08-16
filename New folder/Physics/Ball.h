@@ -1,5 +1,6 @@
 #pragma once
 #include "Circle.h"
+#include <glm/ext.hpp>
 
 class Ball : public Circle
 {
@@ -15,4 +16,11 @@ public:
 
 protected:
 	BallType m_ballType;
+
+private:
+	glm::vec4 m_yellow = glm::vec4(1, 0.8f, 0, 1);
+	glm::vec4 m_red = glm::vec4(1, 0, 0, 1);
+	glm::vec4 m_black = glm::vec4(0, 0, 0, 1);
+	glm::vec4 m_white = glm::vec4(1, 1, 1, 1);
+	glm::vec4 m_magenta = glm::vec4(1, 0, 0.65f, 1);
 };

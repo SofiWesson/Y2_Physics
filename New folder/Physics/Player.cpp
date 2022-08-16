@@ -32,8 +32,6 @@ void Player::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 
 	aie::Input* input = aie::Input::getInstance();
 
-	//m_rigidbody->SetCollider(Circle())
-
 	if (this->RigidBody::GetShapeID() == BOX)
 	{
 		/* Fisrt store the local axes */

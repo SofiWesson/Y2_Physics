@@ -21,6 +21,7 @@ public:
 
 	glm::vec2 ToWorld(glm::vec2 a_localPos);
 
+	// Getters
 	glm::vec2 GetPosition() { return m_positon; }
 	glm::vec2 GetVelocity() { return m_velocity; }
 	float GetRotation() { return m_rotation; }
@@ -31,6 +32,7 @@ public:
 	float GetKineticEnergy();
 	float GetLinearDrag() { return m_linearDrag; }
 
+	// Setters
 	void SetMass(float a_mass) { m_mass = a_mass; }
 	void SetKinematic(bool a_state) { m_isKinematic = a_state; }
 	void SetPosition(glm::vec2 a_position) { m_positon = a_position; }
@@ -45,7 +47,7 @@ public:
 
 protected:
 
-	float m_linearDrag = 0.03f; // make getters and setters
+	float m_linearDrag = 0.03f;
 	float m_angularDrag = 0.03f;
 
 	glm::vec2 m_positon;

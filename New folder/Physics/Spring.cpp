@@ -25,7 +25,6 @@ void Spring::FixedUpdate(glm::vec2 a_gravity, float a_timeStep)
 	// Time to apply damping
 	glm::vec2 relativeVelocity = m_actor2->GetVelocity() - m_actor1->GetVelocity();
 
-	// If f = -kX - bv
 	glm::vec2 force = direction * m_springCoefficient * (m_restLength - length) - m_damping * relativeVelocity;
 	
 	const float threshhold = 1000.f;

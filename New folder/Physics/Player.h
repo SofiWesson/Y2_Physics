@@ -6,14 +6,8 @@
 
 #include <Input.h>
 
-// class RigidBody;
-
 class Player : public RigidBody
 {
-	// rigidboy->collider
-	// collider = box || circle
-	// position of collider is glued to player
-
 public:
 	Player(glm::vec2 a_position, glm::vec2 a_velocity, float a_mass, float a_radius, glm::vec4 a_colour);
 	Player(glm::vec2 a_position, glm::vec2 a_velocity, float a_rotation, float a_mass, float a_width, float a_height, glm::vec4 a_colour);

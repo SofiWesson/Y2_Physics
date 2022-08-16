@@ -1,6 +1,7 @@
 #include "MenuState.h"
 #include "App.h"
 #include "GameStateManager.h"
+#include "PlayState.h"
 
 #include "Input.h"
 #include <glm/ext.hpp>
@@ -19,6 +20,8 @@ MenuState::~MenuState()
 
 bool MenuState::startup()
 {
+	m_GSM = m_app->GetGSM();
+
 	return true;
 }
 
@@ -32,6 +35,8 @@ void MenuState::update(float dt)
 
 	if (input->wasKeyPressed(aie::INPUT_KEY_1))
 	{
+		// instantiate Play state
+		m_GSM->SetState("Play", new PlayState(m_app));
 		m_app->GetGSM()->PopState();
 		m_app->GetGSM()->PushState("Play");
 	}
@@ -55,4 +60,9 @@ void MenuState::draw()
 	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Press 2 for Controls", 10, m_app->getWindowHeight() - 70);
 
 	m_app->Get2DRenderer()->end();
+}
+
+void MenuState::SetGSM(GameStateManager* a_GSM)
+{
+	m_GSM = a_GSM;
 }

@@ -21,6 +21,7 @@ public:
 	virtual void draw();
 
 	void SetState(const char* a_name, GameState* a_gameState);
+	void RemoveState(const char* a_name);
 	void PushState(const char* a_name);
 	void PopState();
 

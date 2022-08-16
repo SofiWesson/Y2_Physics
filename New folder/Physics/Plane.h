@@ -14,7 +14,6 @@ public:
 
 	virtual void FixedUpdate(glm::vec2 a_gravity, float a_timeStep);
 	virtual void MakeGizmo();
-	//virtual void Debug();
 	virtual void ReSetPosition() {}
 
 	void ResolvePlaneCollision(RigidBody* a_rigidbody, glm::vec2 a_contact);

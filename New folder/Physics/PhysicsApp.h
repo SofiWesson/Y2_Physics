@@ -44,7 +44,6 @@ protected:
 	float m_timer = 0.f;
 	float m_timerReset = 0.1f;
 
-	//Application2D* m_app;
 	Player* m_player;
 	Circle* m_ball;
 
@@ -101,7 +100,6 @@ protected:
 	float m_tableActivityTextWidth = 0.f;
 	// ============================================================ UI ============================================================
 
-//====================
 public:
 	Circle* CreateCircle(glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec4 a_colour, glm::vec2 a_force, bool a_isKinematic, bool a_isTrigger, bool a_canCollide);
 	Ball* CreateBall(BallType a_ballType, glm::vec2 a_pos, glm::vec2 a_vel, float a_mass, float a_radius, glm::vec2 a_force, bool a_isKinematic, bool a_isTrigger, bool a_canCollide);
@@ -114,8 +112,6 @@ public:
 	void RackBalls();
 	void HitCueBall(aie::Input* a_input);
 	void SoftbodyTest();
-	void MouseInputTest(aie::Input* a_input);
-	void ObjectTest();
 
 	void LoadUI();
 	void EightBallWinConditions();

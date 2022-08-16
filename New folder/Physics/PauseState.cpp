@@ -32,4 +32,10 @@ void PauseState::update(float dt)
 
 void PauseState::draw()
 {
+	// begin drawing sprites
+	m_app->Get2DRenderer()->begin();
+
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Game Paused", 10, 30);
+
+	m_app->Get2DRenderer()->end();
 }

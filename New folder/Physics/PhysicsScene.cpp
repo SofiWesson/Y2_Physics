@@ -228,14 +228,6 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	Circle* circle1 = dynamic_cast<Circle*>(a_circle);
 	Circle* circle2 = dynamic_cast<Circle*>(a_otherCircle);
 
-	// Player* player = dynamic_cast<Player*>(a_circle);
-	// if (player != nullptr)
-	// 	circle1 = (Circle*)a_circle;
-	// 
-	// player = dynamic_cast<Player*>(a_otherCircle);
-	// if (player != nullptr)
-	// 	circle2 = (Circle*)a_otherCircle;
-
 	// If successful then test for collision
 	if (circle1 != nullptr && circle2 != nullptr) // point of collision is torque // not normaising plane
 	{
@@ -286,14 +278,6 @@ bool PhysicsScene::Box2Circle(PhysicsObject* a_box, PhysicsObject* a_circle) // 
 {
 	Circle* circle = dynamic_cast<Circle*>(a_circle);
 	Box* box = dynamic_cast<Box*>(a_box);
-
-	// Player* player = dynamic_cast<Player*>(a_circle);
-	// if (player != nullptr)
-	// 	circle = (Circle*)a_circle;
-	// 
-	// player = dynamic_cast<Player*>(a_box);
-	// if (player != nullptr)
-	// 	box = (Box*)a_box;
 
 	if (box != nullptr && circle != nullptr)
 	{

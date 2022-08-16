@@ -75,6 +75,18 @@ void GameStateManager::SetState(const char* a_name, GameState* a_gameState)
 		});
 }
 
+void GameStateManager::RemoveState(const char* a_name)
+{
+	m_commands.push_back([=]()
+		{
+			if (m_states[a_name] != nullptr)
+			{
+				m_states[a_name]->shutdown();
+				delete m_states[a_name];
+			}
+		});
+}
+
 void GameStateManager::PushState(const char* a_name)
 {
 	m_commands.push_back([=]()

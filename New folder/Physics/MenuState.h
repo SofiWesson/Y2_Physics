@@ -2,8 +2,10 @@
 
 #include "GameState.h"
 #include "App.h"
+#include "GameStateManager.h"
 
 class App;
+class GameStateManager;
 
 class MenuState : public GameState
 {
@@ -17,7 +19,9 @@ public:
 	void update(float dt);
 	void draw();
 
+	void SetGSM(GameStateManager* a_GSM);
+
 protected:
 	App* m_app;
-
+	GameStateManager* m_GSM;
 };

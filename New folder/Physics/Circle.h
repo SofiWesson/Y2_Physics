@@ -17,8 +17,6 @@ public:
 	void SetRadius(float a_radius) { m_radius = a_radius; }
 	void SetVelocityLastFrame(glm::vec2 a_currentVelocity) { m_velocityLastFrame = a_currentVelocity; }
 
-	void ResolveCircleCollision(Circle* a_otherActor, glm::vec2 a_contact, glm::vec2* a_collisionNormal, float a_pen);
-
 protected:
 	float m_radius;
 	glm::vec4 m_colour;

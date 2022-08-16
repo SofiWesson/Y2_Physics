@@ -93,8 +93,6 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 
 	/* We need to find the vector between their centers or use the provided
 	   directional force, and make sure it is normalised */
-	// glm::vec2 normal = glm::normalize(a_collisionNormal != nullptr ? *a_collisionNormal :
-	// 	a_otherActor->GetPosition() - m_positon);
 
 	glm::vec2 normal;
 
@@ -119,11 +117,6 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 	{
 		if (!IsTrigger() && !a_otherActor->IsTrigger())
 		{
-			// if (a_otherActor->GetIsKinematic())
-			// 	a_otherActor->SetVelocity(glm::vec2(0, 0));
-			// else if (GetIsKinematic())
-			// 	SetVelocity(glm::vec2(0, 0));
-
 			/* this will calculate the effective mass at the contact point for each other
 		   ie. How much the contact point will move due to the forces applied */
 

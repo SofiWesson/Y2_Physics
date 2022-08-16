@@ -55,10 +55,8 @@ bool PhysicsApp::startup(App* a_app)
 	return true;
 }
 
-void PhysicsApp::shutdown() {
-
-	delete m_font;
-	delete m_2dRenderer;
+void PhysicsApp::shutdown()
+{
 }
 
 void PhysicsApp::update(float deltaTime) 
@@ -86,38 +84,13 @@ void PhysicsApp::update(float deltaTime)
 	// get input instance
 	aie::Input* input = aie::Input::getInstance();
 
-	if (input->wasKeyPressed(aie::INPUT_KEY_1))
-	{
-		for each (Ball * ball in m_balls)
-		{
-			if (ball->GetBallType() == EIGHTBALL)
-			{
-				ball->SetPosition(glm::vec2(0, -20));
-			}
-			if (ball->GetBallType() == CUEBALL)
-			{
-				ball->SetPosition(glm::vec2(0, 0));
-			}
-		}
-	}
-
-	if (input->wasKeyPressed(aie::INPUT_KEY_2))
-	{
-		for each (Ball * ball in m_balls)
-		{
-			if (ball->GetBallType() == SOLID)
-			{
-				ball->SetPosition(glm::vec2(0, -30));
-
-			}
-		}
-	}
-
 	// go back to menu
 	if (input->wasKeyPressed(aie::INPUT_KEY_BACKSPACE))
 	{
 		m_app->GetGSM()->PopState();
 		m_app->GetGSM()->PushState("Menu");
+		shutdown();
+
 	}
 
 	aie::Gizmos::clear();
@@ -655,7 +628,7 @@ void PhysicsApp::CreateTable()
 
 void PhysicsApp::RackBalls()
 {
-	// ============================================ POOL BALL SPAWN ============================================ // enum with 4 different ball types
+	// ============================================ POOL BALL SPAWN ============================================
 	Ball* ball = nullptr;
 	
 	glm::vec2 vel = glm::vec2(0, 0);
@@ -671,7 +644,7 @@ void PhysicsApp::RackBalls()
 
 	BallType ballType;
 	
-	for (int x = 0; x < 5; x++)
+	for (int x = 0; x < 5; x++) // spawn balls in triangle formation
 	{
 		for (int y = 0; y < 5 - x; y++)
 		{
@@ -680,7 +653,7 @@ void PhysicsApp::RackBalls()
 	
 			glm::vec2 pos = glm::vec2(xPos, yPos);
 			
-			if (x == 0)
+			if (x == 0) // right most column
 			{
 				if (y == 0 || y == 1 || y == 3)
 					ballType = SOLID;
@@ -743,8 +716,8 @@ void PhysicsApp::HitCueBall(aie::Input* a_input)
 
 			glm::vec2 cuePos = m_cue->GetPosition();
 
+			// line that shows where player is aiming
 			forceVector = glm::vec2(m_cueForceVectorStart - worldPos);
-			
 			float forceVectorLength = glm::length(forceVector);
 			forceVectorLength = glm::clamp(forceVectorLength, 0.f, 20.f);
 
@@ -787,47 +760,6 @@ void PhysicsApp::SoftbodyTest()
 	sb.push_back("0000.|.000000.|.00000.|.000000");
 	sb.push_back("0000.|.000000.|.00000.|.000000");
 	Softbody::Build(m_physicsScene, glm::vec2(-80, 0), 5, 2000, 1, sb);
-}
-
-void PhysicsApp::MouseInputTest(aie::Input* a_input) // not used
-{
-	int screenX, screenY;
-
-	if (a_input->isMouseButtonDown(0))
-	{
-		a_input->getMouseXY(&screenX, &screenY);
-		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
-
-		aie::Gizmos::add2DCircle(worldPos, 5, 32, glm::vec4(.1f, .1f, .9f, 1.f));
-	}
-	if (a_input->wasMouseButtonReleased(0))
-	{
-		a_input->getMouseXY(&screenX, &screenY);
-		glm::vec2 worldPos = ScreenToWorld(glm::vec2(screenX, screenY));
-		Circle* spawn = CreateCircle(worldPos, glm::vec2(0, 0), 4, 4, glm::vec4(.1f, .1f, .4f, 1.f), glm::vec2(0, 0), false, false, true);
-	}
-}
-
-void PhysicsApp::ObjectTest() // not used
-{
-	Circle* ball1 = CreateCircle(glm::vec2(10, 0), glm::vec2(0, 0), 4, 4, glm::vec4(0.f, 1.f, 0.f, 1.f), glm::vec2(0, 0), false, false, true);
-	Circle* ball2 = CreateCircle(glm::vec2(10, -20), glm::vec2(0, 0), 4, 4, glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0, 0), false, false, true);
-	ball2->SetKinematic(true);
-	ball2->SetTrigger(true);
-
-	Plane* plane1 = CreatePlane(glm::vec2(0, 1), -30, glm::vec4(1, 1, 1, 1));
-	Plane* plane2 = CreatePlane(glm::vec2(0, -1), -30, glm::vec4(1, 1, 1, 1));
-	Plane* plane3 = CreatePlane(glm::vec2(1, 0), -30, glm::vec4(1, 1, 1, 1));
-	Plane* plane4 = CreatePlane(glm::vec2(-1, 0), -30, glm::vec4(1, 1, 1, 1));
-
-	ball2->triggerEnter = [=](PhysicsObject* a_other)
-	{
-		std::cout << "Entered: " << a_other << std::endl;
-	};
-	ball2->triggerExit = [=](PhysicsObject* a_other)
-	{
-		std::cout << "Exited: " << a_other << std::endl;
-	};
 }
 
 void PhysicsApp::LoadUI()
@@ -978,6 +910,7 @@ void PhysicsApp::BallSunk(Ball* a_ball)
 		}
 		else if (!m_isPlayer1Turn)
 		{
+			// switch players turn
 			m_isPlayer1Turn = m_player2 == STRIPES ? true : false;
 
 			a_ball->SetVelocity(glm::vec2(0, 0));
@@ -990,12 +923,13 @@ void PhysicsApp::BallSunk(Ball* a_ball)
 			m_p2Sunk.push_back(a_ball);
 		}
 	}
-	else if (a_ball->GetBallType() == STRIPES) // same as SOLID above // STRIPES is red
+	else if (a_ball->GetBallType() == STRIPES) // STRIPES is red
 	{
 		if (!m_firstBallHasBeenSunk)
 		{
 			m_firstBallHasBeenSunk = true;
 
+			// sets what colour each player is
 			m_player1 = m_isPlayer1Turn ? STRIPES : SOLID;
 			m_player2 = m_isPlayer1Turn ? SOLID : STRIPES;
 
@@ -1007,6 +941,7 @@ void PhysicsApp::BallSunk(Ball* a_ball)
 		}
 		if (m_isPlayer1Turn)
 		{
+			// switch players turn
 			m_isPlayer1Turn = m_player1 == STRIPES ? true : false;
 
 			a_ball->SetVelocity(glm::vec2(0, 0));
@@ -1014,11 +949,13 @@ void PhysicsApp::BallSunk(Ball* a_ball)
 			float y = 40 - (ballRadius * 2.5f * m_p1Sunk.size());
 			a_ball->SetPosition(glm::vec2(-70, y));
 
+			// remove from active balls to check
 			m_balls.remove(a_ball);
 			m_p1Sunk.push_back(a_ball);
 		}
 		else if (!m_isPlayer1Turn)
 		{
+			// switch players turn
 			m_isPlayer1Turn = m_player2 == SOLID ? true : false;
 
 			a_ball->SetVelocity(glm::vec2(0, 0));
@@ -1026,6 +963,7 @@ void PhysicsApp::BallSunk(Ball* a_ball)
 			float y = 40 - (ballRadius * 2.5f * m_p2Sunk.size());
 			a_ball->SetPosition(glm::vec2(70, y));
 
+			// remove from active balls to check
 			m_balls.remove(a_ball);
 			m_p2Sunk.push_back(a_ball);
 		}

@@ -2,7 +2,6 @@
 #include "GameStateManager.h"
 #include "Application.h"
 #include "MenuState.h"
-#include "PlayState.h"
 #include "PauseState.h"
 #include "ControlsState.h"
 #include "GameOverState.h"
@@ -39,10 +38,9 @@ bool App::startup()
 	m_GSM->SetState("Menu", new MenuState(this));
 	m_GSM->SetState("Controls", new ControlsState(this));
 	m_GSM->SetState("GameOver", new GameOverState(this));
-	m_GSM->SetState("Play", new PlayState(this));
 	m_GSM->SetState("Pause", new PauseState(this));
 	m_GSM->PushState("Menu");
-
+	
 	return true;
 }
 

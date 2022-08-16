@@ -16,24 +16,17 @@ Ball::Ball(BallType a_ballType, glm::vec2 a_position, glm::vec2 a_velocity, floa
 	m_isKinematic = false;
 	m_moment = .5f * m_mass * a_radius * a_radius;
 	m_ballType = a_ballType;
-
-	glm::vec4 colour;
-	glm::vec4 yellow = glm::vec4(1, 0.8f, 0, 1);
-	glm::vec4 red = glm::vec4(1, 0, 0, 1);
-	glm::vec4 black = glm::vec4(0, 0, 0, 1);
-	glm::vec4 white = glm::vec4(1, 1, 1, 1);
-	glm::vec4 magenta = glm::vec4(1, 0, 0.65f, 1);
-
+	
 	if (a_ballType == SOLID)
-		m_colour = yellow;
+		m_colour = m_yellow;
 	else if (a_ballType == STRIPES)
-		m_colour = red;
+		m_colour = m_red;
 	else if (a_ballType == EIGHTBALL)
-		m_colour = black;
+		m_colour = m_black;
 	else if (a_ballType == CUEBALL)
-		m_colour = white;
+		m_colour = m_white;
 	else
-		m_colour = magenta;
+		m_colour = m_magenta;
 }
 
 Ball::~Ball()
