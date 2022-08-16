@@ -1,7 +1,8 @@
 #include "App.h"
+#include <iostream>
 
-int main() {
-	
+int main()
+{
 	// allocation
 	auto app = new App();
 

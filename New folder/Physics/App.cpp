@@ -30,7 +30,7 @@ bool App::startup()
 
 	// TODO: remember to change this when redistributing a build!
 	// the following path would be used instead: "./font/consolas.ttf"
-	m_font = new aie::Font("../bin/font/consolas.ttf", 32);
+	m_font = new aie::Font("./bin/font/consolas.ttf", 32);
 
 	// ===================================GAME STATE MANAGER==============================
 	m_GSM = new GameStateManager();

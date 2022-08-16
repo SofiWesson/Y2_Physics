@@ -42,7 +42,8 @@ bool PhysicsApp::startup(App* a_app)
 
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
 	m_2dRenderer = new aie::Renderer2D();
-	m_font = new aie::Font("./font/consolas.ttf", 32);
+
+	m_font = m_app->GetFont();
 
 	m_physicsScene = new PhysicsScene();
 	m_physicsScene->SetGravity(glm::vec2(0, 0));

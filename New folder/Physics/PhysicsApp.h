@@ -6,6 +6,9 @@
 #include <list>
 #include <iostream>
 
+#include <string>
+#include <Windows.h>
+
 #include "PhysicsScene.h"
 #include "GameStateManager.h"
 
