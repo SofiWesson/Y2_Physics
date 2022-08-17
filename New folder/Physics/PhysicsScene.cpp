@@ -229,7 +229,7 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 	Circle* circle2 = dynamic_cast<Circle*>(a_otherCircle);
 
 	// If successful then test for collision
-	if (circle1 != nullptr && circle2 != nullptr) // point of collision is torque // not normaising plane
+	if (circle1 != nullptr && circle2 != nullptr)
 	{
 		if (!circle1->CanCollide() || !circle2->CanCollide())
 			return false;
@@ -250,7 +250,6 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* a_circle, PhysicsObject* a_other
 			}
 
 			glm::vec2 contact = circle1->GetPosition() + circle2->GetPosition();
-			//circle1->ResolveCircleCollision(circle2, 0.5f * contact, nullptr, penetration);
 			circle1->ResolveCollision(circle2, 0.5f * contact, nullptr, penetration);
 
 			return true;
