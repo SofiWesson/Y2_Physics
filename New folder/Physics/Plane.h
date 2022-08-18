@@ -1,6 +1,6 @@
 #pragma once
 #include "PhysicsObject.h"
-/* A one sided object and it is considered to extend infinitly along both sides of its edgeand backwards from its normal direction */
+/* A one sided object and it is considered to extend infinitely along both sides of its edge and backwards from its normal direction */
 
 class RigidBody;
 

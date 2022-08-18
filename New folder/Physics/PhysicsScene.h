@@ -32,9 +32,6 @@ public:
 	void SetTimeStep(const float a_timeStep) { m_timeStep = a_timeStep; }
 	float GetTimeStep() const { return m_timeStep; }
 
-	// float GetDT() const { return m_myDT; }
-	// void SetDT(const float a_dt) { m_myDT = a_dt; }
-
 	void CheckForCollisions();
 	
 	static void ApplyContactForces(RigidBody* a_rigidbody1, RigidBody* a_rigidbody2,

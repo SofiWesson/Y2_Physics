@@ -76,7 +76,7 @@ bool Box::CheckCorners(const Box& a_box, glm::vec2& a_contact, int& a_numContact
 	glm::vec2 localContact(0, 0);
 	bool first = true;
 
-	// loop over all coerners of the other box
+	// loop over all corners of the other box
 	for (float x = -a_box.m_extents.x; x < boxW; x += boxW)
 	{
 		for (float y = -a_box.m_extents.y; y < boxH; y += boxH)
