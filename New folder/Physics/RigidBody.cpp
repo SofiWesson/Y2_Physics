@@ -118,7 +118,7 @@ void RigidBody::ResolveCollision(RigidBody* a_otherActor, glm::vec2 a_contact, g
 		if (!IsTrigger() && !a_otherActor->IsTrigger())
 		{
 			/* this will calculate the effective mass at the contact point for each other
-		   ie. How much the contact point will move due to the forces applied */
+		    ie. How much the contact point will move due to the forces applied */
 
 			float massThis = 0.f;
 			float massOther = 0.f;
