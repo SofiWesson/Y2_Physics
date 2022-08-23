@@ -52,9 +52,13 @@ void ControlsState::draw()
 	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Controlling the cue ball - Hold down left mouse button and move in", 10, m_app->getWindowHeight() - 30);
 	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "opposite direction you wish to shoot.", 10, m_app->getWindowHeight() - 60);
 	
-	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Pause - p", 10, m_app->getWindowHeight() - 100);
-	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Backspace - Go back to menu", 10, m_app->getWindowHeight() - 140);
-	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Esc - Exit game", 10, m_app->getWindowHeight() - 180);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Pause - p", 10, m_app->getWindowHeight() - 120);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Backspace - Go back to menu", 10, m_app->getWindowHeight() - 160);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Esc - Exit game", 10, m_app->getWindowHeight() - 200);
+
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "Once a ball is sunk it will be displayed under the player that sunk it,", 10, m_app->getWindowHeight() - 260);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "even if the ball belongs to the other player. This is to show the", 10, m_app->getWindowHeight() - 300);
+	m_app->Get2DRenderer()->drawText(m_app->GetFont(), "players their faults.", 10, m_app->getWindowHeight() - 340);
 
 	m_app->Get2DRenderer()->end();
 }
