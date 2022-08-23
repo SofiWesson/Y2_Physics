@@ -1,6 +1,7 @@
 #include "GameOverState.h"
 #include "App.h"
 #include "GameStateManager.h"
+#include "PhysicsApp.h"
 
 #include "Input.h"
 #include <glm/ext.hpp>
@@ -21,6 +22,8 @@ GameOverState::~GameOverState()
 
 bool GameOverState::startup()
 {
+	m_backTextWidth = m_app->GetFont()->getStringWidth(m_backText);
+
 	return false;
 }
 
@@ -35,9 +38,7 @@ void GameOverState::update(float dt)
 
 	if (input->wasKeyPressed(aie::INPUT_KEY_BACKSPACE))
 	{
-		m_app->GetGSM()->PopState();
-		m_app->GetGSM()->PopState();
-		m_app->GetGSM()->PushState("Menu");
+		m_physicsApp->ShutDownGame(m_app->GetGSM()->GetNumOfStates());
 	}
 }
 
@@ -53,7 +54,17 @@ void GameOverState::draw()
 	std::strcat(playerWinText, m_winText);
 	float playerWinTextWidth = m_app->GetFont()->getStringWidth(playerWinText);
 
-	m_app->Get2DRenderer()->drawText(m_app->GetFont(), playerWinText, m_app->getWindowWidth() / 2 - playerWinTextWidth / 2, m_app->getWindowHeight() / 2);
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		playerWinText,
+		m_app->getWindowWidth() / 2 - playerWinTextWidth / 2,
+		m_app->getWindowHeight() / 2);
+
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		m_backText,
+		m_app->getWindowWidth() / 2 - m_backTextWidth / 2,
+		30);
 
 	m_app->Get2DRenderer()->end();
 }

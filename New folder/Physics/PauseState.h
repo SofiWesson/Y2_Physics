@@ -3,7 +3,6 @@
 #include "GameState.h"
 
 class App;
-class PhysicsApp;
 
 class PauseState : public GameState
 {
@@ -19,6 +18,11 @@ public:
 
 protected:
 	App* m_app;
-	PhysicsApp* m_physApp;
+
+private:
+	float m_textWidth;
+	float m_textHeight;
+
+	const char* m_pausedText = "Game Paused";
 
 };

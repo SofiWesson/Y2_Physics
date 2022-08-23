@@ -25,6 +25,8 @@ public:
 	void PushState(const char* a_name);
 	void PopState();
 
+	int GetNumOfStates() { return m_stack.size(); }
+
 	GameState* GetGameState(const char* a_state);
 
 protected:

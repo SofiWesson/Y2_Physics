@@ -39,6 +39,7 @@ bool PhysicsApp::startup(App* a_app)
 
 	GameState* gs = m_app->GetGSM()->GetGameState("GameOver");
 	m_gameOverState = (GameOverState*)gs;
+	m_gameOverState->SetPhysicsApp(this);
 
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
 	m_2dRenderer = new aie::Renderer2D();
@@ -85,13 +86,37 @@ void PhysicsApp::update(float deltaTime)
 	// get input instance
 	aie::Input* input = aie::Input::getInstance();
 
+	if (input->wasKeyPressed(aie::INPUT_KEY_1))
+	{
+		for each (Ball * ball in m_balls)
+		{
+			if (ball->GetBallType() == EIGHTBALL)
+			{
+				ball->SetPosition(glm::vec2(0, -20));
+			}
+			if (ball->GetBallType() == CUEBALL)
+			{
+				ball->SetPosition(glm::vec2(0, 0));
+			}
+		}
+	}
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_2))
+	{
+		for each (Ball * ball in m_balls)
+		{
+			if (ball->GetBallType() == SOLID)
+			{
+				ball->SetPosition(glm::vec2(0, -30));
+
+			}
+		}
+	}
+
 	// go back to menu
 	if (input->wasKeyPressed(aie::INPUT_KEY_BACKSPACE))
 	{
-		m_app->GetGSM()->PopState();
-		m_app->GetGSM()->PushState("Menu");
-		shutdown();
-
+		ShutDownGame(1);
 	}
 
 	aie::Gizmos::clear();
@@ -116,8 +141,6 @@ void PhysicsApp::draw()
 			(m_app->getWindowWidth() / 2) - (m_noBallsTextWidth / 2),
 			m_app->getWindowHeight() - m_textHeight - 5);
 
-	// TODO make black and white balls stop the other functions from changing players
-	
 	if (m_inPlay)
 	{
 		m_tableActivityText = m_waitText;
@@ -138,7 +161,7 @@ void PhysicsApp::draw()
 		(m_app->getWindowWidth() / 2) - m_tableActivityTextWidth,
 		m_app->getWindowHeight() - tableActivityTextPos);
 
-	// displays which players turn it is with a white ball next to them
+	// Displays which players turn it is with a white ball next to them
 	float playerTurnRadius = 15.f;
 	float playerTurnPosX = m_isPlayer1Turn ? m_player1TextWidth + 20 + playerTurnRadius : m_app->getWindowWidth() - m_player2TextWidth - 20 - playerTurnRadius;
 	float playerTurnPosY = m_app->getWindowHeight() - (m_textHeight / 2) - 10;
@@ -191,7 +214,30 @@ void PhysicsApp::draw()
 		m_app->getWindowWidth() - m_colourTextWidth - m_player2ColourTextWidth - 30,
 		m_app->getWindowHeight() - (m_textHeight * 2) - 20);
 
+	// pause text
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		m_pauseText,
+		10,
+		30);
+
+	// back text
+	m_app->Get2DRenderer()->drawText(
+		m_app->GetFont(),
+		m_backText,
+		m_app->getWindowWidth() - m_backTextWidth - 10,
+		30);
+
 	m_app->Get2DRenderer()->end();
+}
+
+void PhysicsApp::ShutDownGame(int a_statesToPop)
+{
+	for (int i = 0; i < a_statesToPop; i++)
+		m_app->GetGSM()->PopState();
+
+	m_app->GetGSM()->PushState("Menu");
+	shutdown();
 }
 
 glm::vec2 PhysicsApp::ScreenToWorld(glm::vec2 a_screenPos)
@@ -775,6 +821,8 @@ void PhysicsApp::LoadUI()
 	m_redTextWidth = m_app->GetFont()->getStringWidth(m_redText);
 	m_waitTextWidth = m_app->GetFont()->getStringWidth(m_waitText);
 	m_goTextWidth = m_app->GetFont()->getStringWidth(m_goText);
+	m_pauseTextWidth = m_app->GetFont()->getStringWidth(m_pauseText);
+	m_backTextWidth = m_app->GetFont()->getStringWidth(m_backText);
 }
 
 void PhysicsApp::EightBallWinConditions()

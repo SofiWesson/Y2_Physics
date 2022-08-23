@@ -33,6 +33,8 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 
+	void ShutDownGame(int a_statesToPop);
+
 	glm::vec2 ScreenToWorld(glm::vec2 a_screenPos);
 
 protected:
@@ -81,6 +83,8 @@ protected:
 	const char* m_redText = "Red";
 	const char* m_waitText = "Wait";
 	const char* m_goText = "Go";
+	const char* m_pauseText = "P to Pause";
+	const char* m_backText = "Backspace to go Back";
 
 	const char* m_player1ColourText = "";
 	const char* m_player2ColourText = "";
@@ -97,6 +101,8 @@ protected:
 	float m_redTextWidth;
 	float m_waitTextWidth;
 	float m_goTextWidth;
+	float m_pauseTextWidth;
+	float m_backTextWidth;
 
 	float m_player1ColourTextWidth = 0.f;
 	float m_player2ColourTextWidth = 0.f;
