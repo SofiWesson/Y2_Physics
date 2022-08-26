@@ -16,6 +16,8 @@ public:
 	virtual void update(float dt);
 	virtual void draw();
 
+	void LoadUI();
+
 protected:
 	App* m_app;
 

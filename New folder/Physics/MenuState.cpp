@@ -3,11 +3,11 @@
 #include "GameStateManager.h"
 #include "PlayState.h"
 
-#include "Input.h"
 #include <glm/ext.hpp>
 #include <Gizmos.h>
-#include "Renderer2D.h"
 #include "Font.h"
+#include <Input.h>
+#include <glm/glm.hpp>
 
 MenuState::MenuState(App *a_app) : m_app(a_app)
 {

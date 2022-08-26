@@ -19,6 +19,7 @@
 #include "Softbody.h"
 #include "Ball.h"
 #include "GameOverState.h"
+#include "PauseState.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -40,6 +41,11 @@ bool PhysicsApp::startup(App* a_app)
 	GameState* gs = m_app->GetGSM()->GetGameState("GameOver");
 	m_gameOverState = (GameOverState*)gs;
 	m_gameOverState->SetPhysicsApp(this);
+	m_gameOverState->LoadUI();
+
+	gs = m_app->GetGSM()->GetGameState("Pause");
+	PauseState* pause = (PauseState*)gs;
+	pause->LoadUI();
 
 	aie::Gizmos::create(255U, 255U, 65535U, 65535U);
 	m_2dRenderer = new aie::Renderer2D();
@@ -85,33 +91,6 @@ void PhysicsApp::update(float deltaTime)
 
 	// get input instance
 	aie::Input* input = aie::Input::getInstance();
-
-	if (input->wasKeyPressed(aie::INPUT_KEY_1))
-	{
-		for each (Ball * ball in m_balls)
-		{
-			if (ball->GetBallType() == EIGHTBALL)
-			{
-				ball->SetPosition(glm::vec2(0, -20));
-			}
-			if (ball->GetBallType() == CUEBALL)
-			{
-				ball->SetPosition(glm::vec2(0, 0));
-			}
-		}
-	}
-
-	if (input->wasKeyPressed(aie::INPUT_KEY_2))
-	{
-		for each (Ball * ball in m_balls)
-		{
-			if (ball->GetBallType() == SOLID)
-			{
-				ball->SetPosition(glm::vec2(0, -30));
-
-			}
-		}
-	}
 
 	// go back to menu
 	if (input->wasKeyPressed(aie::INPUT_KEY_BACKSPACE))

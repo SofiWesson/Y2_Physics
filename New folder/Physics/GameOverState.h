@@ -16,6 +16,7 @@ public:
 	void update(float dt);
 	void draw();
 
+	void LoadUI();
 	void SetPlayWon(const char* a_player);
 	void SetPhysicsApp(PhysicsApp* a_physicsApp) { m_physicsApp = a_physicsApp; }
 

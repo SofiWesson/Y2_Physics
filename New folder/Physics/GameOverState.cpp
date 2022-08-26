@@ -2,12 +2,14 @@
 #include "App.h"
 #include "GameStateManager.h"
 #include "PhysicsApp.h"
-
-#include "Input.h"
-#include <glm/ext.hpp>
-#include <Gizmos.h>
 #include "Renderer2D.h"
+
+#include <glm/ext.hpp>
+#include <glm/glm.hpp>
+#include <Gizmos.h>
+#include "Texture.h"
 #include "Font.h"
+#include <Input.h>
 #include <cstring>
 
 GameOverState::GameOverState(App* a_app) : m_app(a_app)
@@ -22,8 +24,6 @@ GameOverState::~GameOverState()
 
 bool GameOverState::startup()
 {
-	m_backTextWidth = m_app->GetFont()->getStringWidth(m_backText);
-
 	return false;
 }
 
@@ -67,6 +67,11 @@ void GameOverState::draw()
 		30);
 
 	m_app->Get2DRenderer()->end();
+}
+
+void GameOverState::LoadUI()
+{
+	m_backTextWidth = m_app->GetFont()->getStringWidth(m_backText);
 }
 
 void GameOverState::SetPlayWon(const char* a_player)
